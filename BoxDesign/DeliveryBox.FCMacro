@@ -1,0 +1,236 @@
+#*****************************************************************************
+#
+#  System        : 
+#  Module        : 
+#  Object Name   : $RCSfile$
+#  Revision      : $Revision$
+#  Date          : $Date$
+#  Author        : $Author$
+#  Created By    : Robert Heller
+#  Created       : 2026-06-16 16:40:27
+#  Last Modified : <260616.1645>
+#
+#  Description	
+#
+#  Notes
+#
+#  History
+#	
+#*****************************************************************************
+#
+#    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
+#			51 Locke Hill Road
+#			Wendell, MA 01379-9728
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# 
+#
+#*****************************************************************************
+
+
+import FreeCAD as App
+import Part, TechDraw, Mesh
+from FreeCAD import Base
+
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+import Units
+from debug import debug
+import datetime                                                                 
+
+import time
+
+import csv 
+
+from PySide.QtCore import QCoreApplication, QEventLoop, QTimer
+
+def execute(loop, ms):
+    timer = QTimer()
+    timer.setSingleShot(True)
+    
+    timer.timeout.connect(loop.quit)
+    timer.start(ms)
+    loop.exec_()
+
+def sleep(ms):
+    if not QCoreApplication.instance():
+        app = QCoreApplication([])
+        execute(app, ms)
+    else:
+        loop = QEventLoop()
+        execute(loop, ms)
+                                        
+
+
+def NormalizeMM(x):
+    return round(x,3)
+
+class BOMHelper(object):
+    __BOM = dict()
+    @classmethod
+    def AddPiece(cls,width,height,kind):
+        key = (NormalizeMM(width),NormalizeMM(height),kind)
+        if key in cls.__BOM:
+            cls.__BOM[key] += 1
+        else:
+            cls.__BOM[key] = 1
+    @classmethod
+    def _normPartSizeMM(cls,t):
+        return ("%.3fx%.3f" % t)
+    @staticmethod
+    def _inch(mm):
+        return mm / 25.4
+    @classmethod
+    def _normPartSizeIN(cls,t):
+        X, Y = t
+        return ("%.4fx%.4f" % (cls._inch(X), cls._inch(Y)))
+    _units = 'in'
+    @classmethod
+    def SetUnits(cls,units):
+        if units == 'in' or units == 'mm':
+            cls._units = units
+        else:
+            raise RuntimeError("Unsupport units!")
+    @classmethod
+    def GetUnits(cls):
+        return cls._units
+    @classmethod
+    def _normPartSize(cls,t):
+        if cls._units == 'in':
+            return cls._normPartSizeIN(t)
+        elif cls._units == 'mm':
+            return BOMHelper._normPartSizeMM(t)
+        else:
+            raise RuntimeError("Unsupport units!")
+    @classmethod
+    def ListCuts(cls,filename):
+        keys = list(cls.__BOM.keys())
+        keys.sort()
+        f = open(filename,"w")
+        w = csv.writer(f)
+        w.writerow([("Size (%s)" % cls._units),"Count"])
+        for key in keys:
+            X, Y, kind = key
+            w.writerow([cls._normPartSize((X,Y)),kind,cls.__BOM[key]])
+        f.close()
+    
+
+class Sheet(BOMHelper):
+    def __init__(self):
+        raise RuntimeError("No Instances allowed for Sheet")
+    __AB3_8Thick = Units.mm(3/8)
+    @classmethod
+    def ABThick(cls):
+        return cls.__AB3_8Thick
+    __Birch1_4Thick = Units.mm(1/4)
+    @classmethod
+    def BirchThick(cls):
+        return cls.__Birch1_4Thick
+    __Masonite1_8Thick = Units.mm(1/8)
+    @classmethod
+    def MasoniteThick(cls):
+        return cls.__Masonite1_8Thick
+    __Lexan1_8Thick = Units.mm(1/8)
+    @classmethod
+    def LexanThick(cls):
+        return cls.__Lexan1_8Thick
+    __Color = (1.0,1.0,0.0)
+    __BirchColor = (1.0,1.0,1.0)
+    __MasoniteColor = (139.0/255.0,  35.0/255.0,  35.0/255.0) 
+    @classmethod
+    def Color(cls):
+        return cls.__Color
+    @classmethod
+    def BirchColor(cls):
+        return cls.__BirchColor
+    @classmethod
+    def MasoniteColor(cls):
+        return cls.__MasoniteColor
+    @classmethod
+    def XYSheet(cls,origin,width,length,sheettype="AB"):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        thick = None
+        kind = None
+        if sheettype == "AB":
+            thick = cls.__AB3_8Thick
+            kind = "3/8 AB Plywood"
+        elif sheettype == "Birch":
+            thick = cls.__Birch1_4Thick
+            kind = "1/4 Birch Plywood"
+        elif sheettype == "Masonite":
+            thick = cls.__Masonite1_8Thick
+            kind = "1/8 Masonite"
+        elif sheettype == "Lexan":
+            thick = cls.__Lexan1_8Thick
+            kind = "1/8 Lexan"
+        else:
+            raise RuntimeError("Unsupport plywood type")
+        sheet = Part.makePlane(width,length,origin,Base.Vector(0,0,1)).extrude(Base.Vector(0,0,thick))
+        bb = sheet.BoundBox
+        cls.AddPiece(bb.XLength,bb.YLength,kind)
+        return sheet
+    @classmethod
+    def XZSheet(cls,origin,width,length,sheettype="AB"):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        thick = None
+        kind = None
+        if sheettype == "AB":
+            thick = cls.__AB3_8Thick
+            kind = "3/8 AB Plywood"
+        elif sheettype == "Birch":
+            thick = cls.__Birch1_4Thick
+            kind = "1/4 Birch Plywood"
+        elif sheettype == "Masonite":
+            thick = cls.__Masonite1_8Thick
+            kind = "1/8 Masonite"
+        elif sheettype == "Lexan":
+            thick = cls.__Lexan1_8Thick
+            kind = "1/8 Lexan"
+        else:
+            raise RuntimeError("Unsupport plywood type")
+        sheet = Part.makePlane(width,length,origin,Base.Vector(0,1,0)).extrude(Base.Vector(0,thick,0))
+        bb = sheet.BoundBox
+        cls.AddPiece(bb.XLength,bb.ZLength,kind)
+        return sheet
+    @classmethod
+    def YZSheet(cls,origin,width,length,sheettype="AB"):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        thick = None
+        kind = None
+        if sheettype == "AB":
+            thick = cls.__AB3_8Thick
+            kind = "3/8 AB Plywood"
+        elif sheettype == "Birch":
+            thick = cls.__Birch1_4Thick
+            kind = "1/4 Birch Plywood"
+        elif sheettype == "Masonite":
+            thick = cls.__Masonite1_8Thick
+            kind = "1/8 Masonite"
+        elif sheettype == "Lexan":
+            thick = cls.__Lexan1_8Thick
+            kind = "1/8 Lexan"
+        else:
+            raise RuntimeError("Unsupport plywood type")
+        sheet = Part.makePlane(width,length,origin.add(Base.Vector(0,length,0)),Base.Vector(1,0,0)).extrude(Base.Vector(thick,0,0))
+        bb = sheet.BoundBox
+        cls.AddPiece(bb.ZLength,bb.YLength,kind)
+        return sheet
+    
+
