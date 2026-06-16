@@ -1,8 +1,8 @@
 # Delivery Box -- A lockable box for delivery prople to deliver stuff to.
 
-- [BoxDesign](BoxDesign/READNE.md)
+- [BoxDesign](BoxDesign/README.md)
 
-- [Circuit](Circuit/READNE.md)
+- [Circuit](Circuit/README.md)
 
-- [Firmware](Firmware/READNE.md)
+- [Firmware](Firmware/README.md)
 
