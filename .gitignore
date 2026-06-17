@@ -55,9 +55,10 @@ cov.info
 gmon.out
 
 # generated code by doxgen
-doc/html/*
-doc/latex/*
-doc/warnings
+html/
+latex/
+warnings
+
 
 # build artifacts
 timestamp
@@ -72,6 +73,7 @@ demangled.txt
 *.ndlst
 *.stripped
 objcopy.params
+Build/
 
 # files that are local to the build environment
 set250k.c

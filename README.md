@@ -4,5 +4,5 @@
 
 - [Circuit](Circuit/README.md)
 
-- [Firmware](Firmware/README.md)
+- [Firmware](DeliveryBoxFirmware/README.md)
 

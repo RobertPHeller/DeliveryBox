@@ -7,8 +7,8 @@
 #  Date          : $Date$
 #  Author        : $Author$
 #  Created By    : Robert Heller
-#  Created       : 2026-06-16 16:07:14
-#  Last Modified : <260616.1614>
+#  Created       : 2026-06-17 06:24:54
+#  Last Modified : <260617.0731>
 #
 #  Description	
 #
@@ -43,25 +43,35 @@
 ##############################################################################
 
 
-set(deps
-    driver
-    heap
-    nvs_flash
-    vfs
-    app_update
-    spiffs
-    json
-    esp_timer
-    Adafruit_Keypad
-)
+INO = DeliveryBoxFirmware.ino
 
-idf_component_register(SRCS DeliveryBox.cpp
-		       REQUIRES "${deps}")
+SOURCES = $(wildcard *.cpp) $(wildcard *.h)
 
-set_source_files_properties(DeliveryBox.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=maybe-uninitialized -Wno-implicit-fallthrough -Wno-ignored-qualifiers")
+TARGET = Build/$(INO).merged.bin
 
-#add_custom_target(Documentation
-#		  ALL
-#		  COMMAND make PROJECTNAME="${project_name}" PROJECTNUMBER="${project_ver}" -C "${CMAKE_CURRENT_SOURCE_DIR}/../doc"
-#		  VERBATIM
-#		  )                    
+
+all: $(TARGET) DOC
+
+$(TARGET): $(INO) $(SOURCES) Revision.h 
+	-mkdir Build
+	arduino --verbose --verify \
+		--board esp32:esp32:adafruit_feather_esp32s3 \
+		--pref build.path=Build $(INO)
+
+upload: $(TARGET)
+	arduino --upload --board esp32:esp32:adafruit_feather_esp32s3 \
+		--pref build.path=Build --port /dev/ttyUSB0 \
+		$(INO)
+		
+Revision.h: FORCE 
+	python3 ./Revision.py -d -t -H -U
+
+DOC: $(TARGET) Doxyfile
+	-rm -rf latex html
+	doxygen
+	$(MAKE) -C latex
+	mv latex/refman.pdf ./UserManual.pdf
+
+FORCE:
+
+
