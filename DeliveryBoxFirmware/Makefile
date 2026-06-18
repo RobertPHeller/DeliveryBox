@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-17 06:24:54
-#  Last Modified : <260617.0731>
+#  Last Modified : <260617.1055>
 #
 #  Description	
 #
@@ -49,18 +49,20 @@ SOURCES = $(wildcard *.cpp) $(wildcard *.h)
 
 TARGET = Build/$(INO).merged.bin
 
+BOARD = adafruit_feather_esp32s3
+PORT  = /dev/ttyUSB0
 
 all: $(TARGET) DOC
 
 $(TARGET): $(INO) $(SOURCES) Revision.h 
 	-mkdir Build
 	arduino --verbose --verify \
-		--board esp32:esp32:adafruit_feather_esp32s3 \
+		--board esp32:esp32:$(BOARD) \
 		--pref build.path=Build $(INO)
 
 upload: $(TARGET)
-	arduino --upload --board esp32:esp32:adafruit_feather_esp32s3 \
-		--pref build.path=Build --port /dev/ttyUSB0 \
+	arduino --upload --board esp32:esp32:$(BOARD) \
+		--pref build.path=Build --port $(PORT) \
 		$(INO)
 		
 Revision.h: FORCE 
