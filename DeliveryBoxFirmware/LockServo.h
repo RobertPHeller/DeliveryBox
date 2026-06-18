@@ -1,4 +1,4 @@
-// -!- c++ -!- //////////////////////////////////////////////////////////////
+// -!- C++ -!- //////////////////////////////////////////////////////////////
 //
 //  System        : 
 //  Module        : 
@@ -7,8 +7,8 @@
 //  Date          : $Date$
 //  Author        : $Author$
 //  Created By    : Robert Heller
-//  Created       : Tue Aug 27 09:57:16 2024
-//  Last Modified : <260618.1500>
+//  Created       : 2026-06-18 14:23:07
+//  Last Modified : <260618.1505>
 //
 //  Description	
 //
@@ -18,7 +18,7 @@
 //	
 /////////////////////////////////////////////////////////////////////////////
 /// @copyright
-///    Copyright (C) 2024  Robert Heller D/B/A Deepwoods Software
+///    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
 ///			51 Locke Hill Road
 ///			Wendell, MA 01379-9728
 ///
@@ -35,47 +35,60 @@
 ///    You should have received a copy of the GNU General Public License
 ///    along with this program; if not, write to the Free Software
 ///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/// @file BackgroundTask.h
+/// @file LockServo.h
 /// @author Robert Heller
-/// @date Tue Aug 27 09:57:16 2024
+/// @date 2026-06-18 14:23:07
 /// 
 ///
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BACKGROUNDTASK_H
-#define __BACKGROUNDTASK_H
+#ifndef LOCKSERVO_H
+#define LOCKSERVO_H
 
-#include <vector>
+#include <Arduino.h>
+#include <ESP32Servo.h> 
+#include "GPIO_MAP.h" 
+#include "Singleton.h"
 
-/** Runs tasks during idle times (eg while waiting).
- * Classes derived from this class provide a function to call when things are
- * idle.
+namespace LockServo {
+
+/** Class to manage the lock.
  */
-class BackgroundTask
+class LockServo : public Servo, public Singleton<LockServo>
 {
 public:
-    /** Constructor.  Add ourself to the vector of idle tasks. */
-    BackgroundTask()
+    /** Constructor. */
+    LockServo() 
     {
-        addTask(this);
     }
-    /** Destructor. Remove ourself from the vector of idle tasks. */
-    ~BackgroundTask()
+    /** Initialize the lock servo. */
+    static void Initialize()
     {
-        removeTask(this);
+        instance()->_begin();
     }
-    /** Our task. */
-    virtual void RunTask() = 0;
-    /** Run idle tasks.
-     * @param sleepMillis Delay once all tasks have been run.
-     */
-    static void RunTasks(int sleepMillis);
+    /** Close the lock. */
+    static void lock()
+    {
+        instance()->_lock();
+    }
+    /** Open the lock. */
+    static void unlock()
+    {
+        instance()->_unlock();
+    }
+    /** Is the lock closed? */
+    static bool IsLocked()
+    {
+        return instance()->_locked;
+    }
 private:
-    typedef std::vector<BackgroundTask *> TaskVector;
-    static TaskVector taskVector_;
-    static void addTask(BackgroundTask *task);
-    static void removeTask(BackgroundTask *task);
+    void _begin();
+    void _lock();
+    void _unlock();
+    bool _locked;
+    static constexpr int LockedPosition = 0;
+    static constexpr int UnLockedPosition = 90;
 };
 
-#endif // __BACKGROUNDTASK_H
-
+}
+#endif // LOCKSERVO_H

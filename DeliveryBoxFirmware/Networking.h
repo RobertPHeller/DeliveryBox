@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 16:14:05
-//  Last Modified : <260617.1614>
+//  Last Modified : <260618.1501>
 //
 //  Description	
 //
@@ -46,6 +46,10 @@
 #define __NETWORKING_H__
 
 namespace Networking {
+
+/** Initialize the network: start the WiFi, advertize on the mDNS, and start
+ * the webserver.
+ */
 
 void Initialize();
 

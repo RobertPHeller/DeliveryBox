@@ -1,4 +1,4 @@
-// -!- c++ -!- //////////////////////////////////////////////////////////////
+// -!- C++ -!- //////////////////////////////////////////////////////////////
 //
 //  System        : 
 //  Module        : 
@@ -7,8 +7,8 @@
 //  Date          : $Date$
 //  Author        : $Author$
 //  Created By    : Robert Heller
-//  Created       : Tue Aug 27 09:57:16 2024
-//  Last Modified : <260618.1500>
+//  Created       : 2026-06-18 14:25:55
+//  Last Modified : <260618.1448>
 //
 //  Description	
 //
@@ -18,7 +18,7 @@
 //	
 /////////////////////////////////////////////////////////////////////////////
 /// @copyright
-///    Copyright (C) 2024  Robert Heller D/B/A Deepwoods Software
+///    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
 ///			51 Locke Hill Road
 ///			Wendell, MA 01379-9728
 ///
@@ -35,47 +35,52 @@
 ///    You should have received a copy of the GNU General Public License
 ///    along with this program; if not, write to the Free Software
 ///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/// @file BackgroundTask.h
+/// @file LockServo.cpp
 /// @author Robert Heller
-/// @date Tue Aug 27 09:57:16 2024
+/// @date 2026-06-18 14:25:55
 /// 
 ///
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BACKGROUNDTASK_H
-#define __BACKGROUNDTASK_H
+static const char rcsid[] = "@(#) : $Id$";
 
-#include <vector>
 
-/** Runs tasks during idle times (eg while waiting).
- * Classes derived from this class provide a function to call when things are
- * idle.
- */
-class BackgroundTask
+#include <Arduino.h>
+#include <ESP32Servo.h> 
+#include "GPIO_MAP.h" 
+#include "LockServo.h"
+
+namespace LockServo { 
+
+static LockServo servo;
+DEFINE_SINGLETON_INSTANCE(LockServo);
+
+void LockServo::_begin()
 {
-public:
-    /** Constructor.  Add ourself to the vector of idle tasks. */
-    BackgroundTask()
-    {
-        addTask(this);
-    }
-    /** Destructor. Remove ourself from the vector of idle tasks. */
-    ~BackgroundTask()
-    {
-        removeTask(this);
-    }
-    /** Our task. */
-    virtual void RunTask() = 0;
-    /** Run idle tasks.
-     * @param sleepMillis Delay once all tasks have been run.
-     */
-    static void RunTasks(int sleepMillis);
-private:
-    typedef std::vector<BackgroundTask *> TaskVector;
-    static TaskVector taskVector_;
-    static void addTask(BackgroundTask *task);
-    static void removeTask(BackgroundTask *task);
-};
+    // Allow allocation of all timers
+    ESP32PWM::allocateTimer(0);
+    ESP32PWM::allocateTimer(1);
+    ESP32PWM::allocateTimer(2);
+    ESP32PWM::allocateTimer(3);
+    setPeriodHertz(50);    // standard 50 hz servo
+    attach(LOCK_SERVO, 1000, 2000); // attaches the servo on pin 18 to the servo object
+    // using default min/max of 1000us and 2000us
+    // different servos may require different min/max settings
+    // for an accurate 0 to 180 sweep
+    _unlock();
+}
 
-#endif // __BACKGROUNDTASK_H
+void LockServo::_lock()
+{
+    write(LockedPosition);
+    _locked = true;
+}
 
+void LockServo::_unlock()
+{
+    write(UnLockedPosition);
+    _locked = false;
+}
+
+
+}

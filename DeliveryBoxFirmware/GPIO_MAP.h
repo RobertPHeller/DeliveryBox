@@ -1,4 +1,4 @@
-// -!- c++ -!- //////////////////////////////////////////////////////////////
+// -!- C++ -!- //////////////////////////////////////////////////////////////
 //
 //  System        : 
 //  Module        : 
@@ -7,7 +7,7 @@
 //  Date          : $Date$
 //  Author        : $Author$
 //  Created By    : Robert Heller
-//  Created       : Tue Aug 27 09:57:16 2024
+//  Created       : 2026-06-18 11:42:41
 //  Last Modified : <260618.1500>
 //
 //  Description	
@@ -18,7 +18,7 @@
 //	
 /////////////////////////////////////////////////////////////////////////////
 /// @copyright
-///    Copyright (C) 2024  Robert Heller D/B/A Deepwoods Software
+///    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
 ///			51 Locke Hill Road
 ///			Wendell, MA 01379-9728
 ///
@@ -35,47 +35,26 @@
 ///    You should have received a copy of the GNU General Public License
 ///    along with this program; if not, write to the Free Software
 ///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/// @file BackgroundTask.h
+/// @file GPIO_MAP.h
 /// @author Robert Heller
-/// @date Tue Aug 27 09:57:16 2024
+/// @date 2026-06-18 11:42:41
 /// 
 ///
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BACKGROUNDTASK_H
-#define __BACKGROUNDTASK_H
+#ifndef GPIO_MAP_H
+#define GPIO_MAP_H
 
-#include <vector>
+#include <Arduino.h>
 
-/** Runs tasks during idle times (eg while waiting).
- * Classes derived from this class provide a function to call when things are
- * idle.
- */
-class BackgroundTask
-{
-public:
-    /** Constructor.  Add ourself to the vector of idle tasks. */
-    BackgroundTask()
-    {
-        addTask(this);
-    }
-    /** Destructor. Remove ourself from the vector of idle tasks. */
-    ~BackgroundTask()
-    {
-        removeTask(this);
-    }
-    /** Our task. */
-    virtual void RunTask() = 0;
-    /** Run idle tasks.
-     * @param sleepMillis Delay once all tasks have been run.
-     */
-    static void RunTasks(int sleepMillis);
-private:
-    typedef std::vector<BackgroundTask *> TaskVector;
-    static TaskVector taskVector_;
-    static void addTask(BackgroundTask *task);
-    static void removeTask(BackgroundTask *task);
-};
+/** Lock servo */
+#define LOCK_SERVO 37
 
-#endif // __BACKGROUNDTASK_H
+/** KeyPad Rows */
+#define KEYPAD_ROWS {6, 13, 12, 10}
+/** KeyPad Cols */
+#define KEYPAD_COLS {5, 9, 11}
 
+
+
+#endif // GPIO_MAP_H

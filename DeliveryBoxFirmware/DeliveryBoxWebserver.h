@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 13:58:16
-//  Last Modified : <260617.1437>
+//  Last Modified : <260618.1503>
 //
 //  Description	
 //
@@ -49,17 +49,24 @@
 #include "Singleton.h"
 #include "BackgroundTask.h"
 
+
+/** Webserver class.
+ * Implements a simple webserver.
+ */
 class DeliveryBoxWebserver : public BackgroundTask, public WebServer , 
                              public Singleton<DeliveryBoxWebserver>
 {
 public:
+    /** Constructor. */
     DeliveryBoxWebserver() : WebServer(80), BackgroundTask()
     {
     }
+    /** Start the server. */
     static void StartServer()
     {
         instance()->_startServer();
     }
+    /** Background task: handle client connections. */
     virtual void RunTask()
     {
         handleClient();

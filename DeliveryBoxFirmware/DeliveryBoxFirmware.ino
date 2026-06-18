@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 06:23:17
-//  Last Modified : <260617.1619>
+//  Last Modified : <260618.1549>
 //
 //  Description	
 //
@@ -56,10 +56,13 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Adafruit_Keypad.h>
 #include <Adafruit_LEDBackpack.h>
 #include <ESP32Servo.h>
+#include "GPIO_MAP.h"
 #include "Networking.h"
 #include "DeliveryBoxWebserver.h"
 #include <FS.h>
 #include <SPIFFS.h>
+#include "LockServo.h"
+#include "Display.h"
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\r\n", dirname);
@@ -120,7 +123,10 @@ void setup() {
     Networking::Initialize();
     // Keypad init
     // Display init
+    Display::Display::InitDisplay();
     // Lock init
+    LockServo::LockServo::Initialize();
+    
 }
 
 /** @brief Main loop.
