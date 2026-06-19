@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 06:23:17
-//  Last Modified : <260618.2058>
+//  Last Modified : <260619.1121>
 //
 //  Description	
 //
@@ -44,7 +44,17 @@
 //////////////////////////////////////////////////////////////////////////////
 
 /** @mainpage Delivery Box Firmware 
- *  A lockable box for delivery prople to deliver stuff to.
+ * A lockable box for delivery prople to deliver stuff to.
+ * 
+ * Target dev board: Adafruit Feather ESP32S3, No Psram version (8M flash).
+ * 
+ * This firmware manages the lock via a servo.  There is a numeric keypad and
+ * an eight character 14-segment display.
+ * 
+ * The lock uses 8-digit codes to unlock the box.  There is one master code 
+ * and any number of one-time codes.  The one time codes are given to delivery
+ * drivers when a delivery is scheduled.  Once the driver uses the code to 
+ * deliver the parcel, the code is removed.
  */
 
 static const char rcsid[] = "@(#) : $Id$";
