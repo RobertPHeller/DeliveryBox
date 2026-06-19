@@ -7,8 +7,8 @@
 //  Date          : $Date$
 //  Author        : $Author$
 //  Created By    : Robert Heller
-//  Created       : 2026-06-18 11:42:41
-//  Last Modified : <260618.1636>
+//  Created       : 2026-06-18 20:56:22
+//  Last Modified : <260618.2138>
 //
 //  Description	
 //
@@ -35,26 +35,50 @@
 ///    You should have received a copy of the GNU General Public License
 ///    along with this program; if not, write to the Free Software
 ///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/// @file GPIO_MAP.h
+/// @file LockProcess.h
 /// @author Robert Heller
-/// @date 2026-06-18 11:42:41
+/// @date 2026-06-18 20:56:22
 /// 
 ///
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef GPIO_MAP_H
-#define GPIO_MAP_H
+#ifndef __LOCKPROCESS_H
+#define __LOCKPROCESS_H
 
 #include <Arduino.h>
+#include "Display.h"
+#include "LockServo.h"
+#include "Singleton.h"
+#include <FS.h>
+#include <SPIFFS.h>
+#include <vector>
 
-/** Lock servo */
-#define LOCK_SERVO 37
+namespace LockProcess {
 
-/** KeyPad Row GPIOs */
-#define KEYPAD_ROWS {6, 13, 12, 10}
-/** KeyPad Col GPIOs */
-#define KEYPAD_COLS {5, 9, 11}
+class LockProcess : public Singleton<LockProcess>
+{
+public:
+    LockProcess();
+    static void Initialize()
+    {
+        instance()->_begin();
+    }
+    static void ProcessKey(uint8_t k)
+    {
+        instance()->_processKey(k);
+    }
+private:
+    void _begin();
+    void _processKey(uint8_t k);
+    void _message(const char *m);
+    static constexpr size_t CODELEN = 9;
+    char _buffer[CODELEN];
+    size_t _bufferIndex;
+    String _MasterCode;
+    std::vector<String> _OneTimeCodes;
+};
 
 
+}
 
-#endif // GPIO_MAP_H
+#endif // __LOCKPROCESS_H

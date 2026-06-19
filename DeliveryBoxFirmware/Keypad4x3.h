@@ -7,8 +7,8 @@
 //  Date          : $Date$
 //  Author        : $Author$
 //  Created By    : Robert Heller
-//  Created       : 2026-06-18 11:42:41
-//  Last Modified : <260618.1636>
+//  Created       : 2026-06-18 16:37:26
+//  Last Modified : <260618.1723>
 //
 //  Description	
 //
@@ -35,26 +35,35 @@
 ///    You should have received a copy of the GNU General Public License
 ///    along with this program; if not, write to the Free Software
 ///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-/// @file GPIO_MAP.h
+/// @file Keypad4x3.h
 /// @author Robert Heller
-/// @date 2026-06-18 11:42:41
+/// @date 2026-06-18 16:37:26
 /// 
 ///
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef GPIO_MAP_H
-#define GPIO_MAP_H
+#ifndef __KEYPAD4X3_H
+#define __KEYPAD4X3_H
 
 #include <Arduino.h>
+#include <Adafruit_Keypad.h>
+#include "Singleton.h"
 
-/** Lock servo */
-#define LOCK_SERVO 37
+namespace Keypad4x3 {
 
-/** KeyPad Row GPIOs */
-#define KEYPAD_ROWS {6, 13, 12, 10}
-/** KeyPad Col GPIOs */
-#define KEYPAD_COLS {5, 9, 11}
+class Keypad4x3 : public Adafruit_Keypad, public Singleton<Keypad4x3>
+{
+public:
+    Keypad4x3();
+    static void Initialize()
+    {
+        instance()->begin();
+    }
+private:
+    
+};
+
+}
 
 
-
-#endif // GPIO_MAP_H
+#endif // __KEYPAD4X3_H

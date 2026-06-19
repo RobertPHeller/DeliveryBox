@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 06:23:17
-//  Last Modified : <260618.1549>
+//  Last Modified : <260618.2058>
 //
 //  Description	
 //
@@ -63,6 +63,8 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <SPIFFS.h>
 #include "LockServo.h"
 #include "Display.h"
+#include "Keypad4x3.h"
+#include "LockProcess.h"
 
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels) {
   Serial.printf("Listing directory: %s\r\n", dirname);
@@ -122,10 +124,12 @@ void setup() {
     rgbLedWrite(RGB_BUILTIN,0,0,0);
     Networking::Initialize();
     // Keypad init
+    Keypad4x3::Keypad4x3::Initialize();
     // Display init
     Display::Display::InitDisplay();
     // Lock init
     LockServo::LockServo::Initialize();
+    LockProcess::LockProcess::Initialize();
     
 }
 
@@ -134,5 +138,14 @@ void setup() {
  */
 void loop() {
     // put your main code here, to run repeatedly:
-    BackgroundTask::RunTasks(100);
+    Keypad4x3::Keypad4x3::instance()->tick();
+    while (Keypad4x3::Keypad4x3::instance()->available())
+    {
+        keypadEvent e = Keypad4x3::Keypad4x3::instance()->read();
+        if(e.bit.EVENT == KEY_JUST_PRESSED)
+        {
+            LockProcess::LockProcess::ProcessKey(e.bit.KEY);
+        }
+    }
+    BackgroundTask::RunTasks(10);
 }    
