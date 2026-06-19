@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 21:08:59
-//  Last Modified : <260618.2147>
+//  Last Modified : <260619.0830>
 //
 //  Description	
 //
@@ -70,6 +70,17 @@ LockProcess::LockProcess()
 
 void LockProcess::_begin()
 {
+    _loadMasterCode();
+    _loadOneTimeCodes();
+    LockServo::LockServo::unlock();
+    memset(_buffer,0,sizeof(_buffer));
+    _bufferIndex = 0;
+    Display::Display::ClearDisplay();
+    _message(UNLOCKED);
+}
+
+void LockProcess::_loadMasterCode()
+{
     File fp = SPIFFS.open("/master.txt");
     if (fp)
     {
@@ -80,7 +91,12 @@ void LockProcess::_begin()
     {
         _MasterCode = "99999999"; // default master code.
     }
-    fp = SPIFFS.open("/onetimecodes.txt");
+}
+
+void LockProcess::_loadOneTimeCodes()
+{
+    _OneTimeCodes.clear();
+    File fp = SPIFFS.open("/onetimecodes.txt");
     if (fp)
     {
         do
@@ -91,11 +107,41 @@ void LockProcess::_begin()
         } while(fp);
         fp.close();
     }
-    LockServo::LockServo::unlock();
-    memset(_buffer,0,sizeof(_buffer));
-    _bufferIndex = 0;
-    Display::Display::ClearDisplay();
-    _message(UNLOCKED);
+}
+
+void LockProcess::_rewriteOneTimeCodes()
+{
+    File fp = SPIFFS.open("/onetimecodes.txt", FILE_WRITE);
+    if (fp)
+    {
+        for (auto ic = _OneTimeCodes.begin(); ic != _OneTimeCodes.end(); ic++)
+        {
+            fp.println(*ic);
+        }
+        fp.close();
+    }
+}
+
+void LockProcess::_setmaster(String newcode)
+{
+    File fp = SPIFFS.open("/master.txt", FILE_WRITE);
+    if (fp)
+    {
+        fp.println(newcode);
+        fp.close();
+        _loadMasterCode();
+    }
+}
+
+void LockProcess::_addonetime(String newcode)
+{
+    File fp = SPIFFS.open("/onetimecodes.txt", FILE_APPEND);
+    if (fp)
+    {
+        fp.println(newcode);
+        fp.close();
+        _loadOneTimeCodes();
+    }
 }
 
 void LockProcess::_message(const char *m)
@@ -130,6 +176,7 @@ void LockProcess::_processKey(uint8_t k)
             if (*ic == _buffer)
             {
                 _OneTimeCodes.erase(ic);
+                _rewriteOneTimeCodes();
                 LockServo::LockServo::unlock();
                 memset(_buffer,0,sizeof(_buffer));
                 _bufferIndex = 0;

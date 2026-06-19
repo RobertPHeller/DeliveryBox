@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 20:56:22
-//  Last Modified : <260618.2138>
+//  Last Modified : <260619.0827>
 //
 //  Description	
 //
@@ -67,10 +67,23 @@ public:
     {
         instance()->_processKey(k);
     }
+    static void SetMasterCode(String newcode)
+    {
+        instance()->_setmaster(newcode);
+    }
+    static void AddOneTimeCode(String newcode)
+    {
+        instance()->_addonetime(newcode);
+    }
 private:
     void _begin();
+    void _loadMasterCode();
+    void _loadOneTimeCodes();
     void _processKey(uint8_t k);
     void _message(const char *m);
+    void _setmaster(String newcode);
+    void _addonetime(String newcode);
+    void _rewriteOneTimeCodes();
     static constexpr size_t CODELEN = 9;
     char _buffer[CODELEN];
     size_t _bufferIndex;

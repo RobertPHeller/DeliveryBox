@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 14:15:08
-//  Last Modified : <260619.0624>
+//  Last Modified : <260619.0815>
 //
 //  Description	
 //
@@ -77,12 +77,28 @@ String DeliveryBoxWebserver::_page()
         result += "<h3 style=\"color:red;\">Box is unlocked</h3>";
     }
     result += "<form method='post' action='/' >\n";
+    result += "<label for='master-code'>Master Code</label>\n";
+    result += "<input type='number' id='master-code' name='master-code' size='8' maxlength='8' />\n";
+    result += "<button type='submit' name='set-master' value='true'>Set Master Code</button>\n";
+    result += "</form>\n";
+    result += "<form method='post' action='/' >\n";
+    result += "<label for='one-time'>One Time Code</label>\n";
+    result += "<input type='number' id='one-time' name='one-time' size='8' maxlength='8' />\n";
+    result += "<button type='submit' name='add-one-time' value='true'>Add One Time Code</button>\n";
     result += "</form>\n";
     return result;
 }
 
 void DeliveryBoxWebserver::_processForm()
 {
+    if (hasArg("set-master"))
+    {
+        LockProcess::LockProcess::SetMasterCode(arg("master-code"));
+    }
+    if (hasArg("add-one-time"))
+    {
+        LockProcess::LockProcess::AddOneTimeCode(arg("one-time"));
+    }
 }
 
 void DeliveryBoxWebserver::_notFound()
