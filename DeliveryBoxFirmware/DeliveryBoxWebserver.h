@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 13:58:16
-//  Last Modified : <260618.1503>
+//  Last Modified : <260619.0618>
 //
 //  Description	
 //
@@ -77,6 +77,7 @@ private:
         on("/", MainScreen);
         on("/style.css", SendStyle);
         on("/javascript.js", SendJavaScript);
+        on("/Robot1-110.png", SendRobot1_110);
         onNotFound(NotFound);
         begin();
     }
@@ -88,8 +89,12 @@ private:
     void _sendStyle();
     static void SendJavaScript() {instance()->_sendJavaScript();}
     void _sendJavaScript();
+    static void SendRobot1_110() {instance()->_sendRobot1_110();}
+    void _sendRobot1_110();
     String header_(String title);
     String footer_();
+    String _page();
+    void _processForm();
 };
 
 #endif // __DELIVERYBOXWEBSERVER_H__
