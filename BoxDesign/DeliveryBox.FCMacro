@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260616.1645>
+#  Last Modified : <260620.0904>
 #
 #  Description	
 #
@@ -132,52 +132,23 @@ class BOMHelper(object):
 class Sheet(BOMHelper):
     def __init__(self):
         raise RuntimeError("No Instances allowed for Sheet")
-    __AB3_8Thick = Units.mm(3/8)
+    __CDX3_8Thick = Units.mm(7/32)
     @classmethod
-    def ABThick(cls):
-        return cls.__AB3_8Thick
-    __Birch1_4Thick = Units.mm(1/4)
-    @classmethod
-    def BirchThick(cls):
-        return cls.__Birch1_4Thick
-    __Masonite1_8Thick = Units.mm(1/8)
-    @classmethod
-    def MasoniteThick(cls):
-        return cls.__Masonite1_8Thick
-    __Lexan1_8Thick = Units.mm(1/8)
-    @classmethod
-    def LexanThick(cls):
-        return cls.__Lexan1_8Thick
+    def CDXThick(cls):
+        return cls.__CDX3_8Thick
     __Color = (1.0,1.0,0.0)
-    __BirchColor = (1.0,1.0,1.0)
-    __MasoniteColor = (139.0/255.0,  35.0/255.0,  35.0/255.0) 
     @classmethod
     def Color(cls):
         return cls.__Color
     @classmethod
-    def BirchColor(cls):
-        return cls.__BirchColor
-    @classmethod
-    def MasoniteColor(cls):
-        return cls.__MasoniteColor
-    @classmethod
-    def XYSheet(cls,origin,width,length,sheettype="AB"):
+    def XYSheet(cls,origin,width,length,sheettype="CDX"):
         if not isinstance(origin,Base.Vector):
             raise RuntimeError("origin is not a Vector!")
         thick = None
         kind = None
-        if sheettype == "AB":
-            thick = cls.__AB3_8Thick
-            kind = "3/8 AB Plywood"
-        elif sheettype == "Birch":
-            thick = cls.__Birch1_4Thick
-            kind = "1/4 Birch Plywood"
-        elif sheettype == "Masonite":
-            thick = cls.__Masonite1_8Thick
-            kind = "1/8 Masonite"
-        elif sheettype == "Lexan":
-            thick = cls.__Lexan1_8Thick
-            kind = "1/8 Lexan"
+        if sheettype == "CDX":
+            thick = cls.__CDX3_8Thick
+            kind = "3/8 CDX Plywood"
         else:
             raise RuntimeError("Unsupport plywood type")
         sheet = Part.makePlane(width,length,origin,Base.Vector(0,0,1)).extrude(Base.Vector(0,0,thick))
@@ -185,23 +156,14 @@ class Sheet(BOMHelper):
         cls.AddPiece(bb.XLength,bb.YLength,kind)
         return sheet
     @classmethod
-    def XZSheet(cls,origin,width,length,sheettype="AB"):
+    def XZSheet(cls,origin,width,length,sheettype="CDX"):
         if not isinstance(origin,Base.Vector):
             raise RuntimeError("origin is not a Vector!")
         thick = None
         kind = None
-        if sheettype == "AB":
-            thick = cls.__AB3_8Thick
-            kind = "3/8 AB Plywood"
-        elif sheettype == "Birch":
-            thick = cls.__Birch1_4Thick
-            kind = "1/4 Birch Plywood"
-        elif sheettype == "Masonite":
-            thick = cls.__Masonite1_8Thick
-            kind = "1/8 Masonite"
-        elif sheettype == "Lexan":
-            thick = cls.__Lexan1_8Thick
-            kind = "1/8 Lexan"
+        if sheettype == "CDX":
+            thick = cls.__CDX3_8Thick
+            kind = "3/8 CDX Plywood"
         else:
             raise RuntimeError("Unsupport plywood type")
         sheet = Part.makePlane(width,length,origin,Base.Vector(0,1,0)).extrude(Base.Vector(0,thick,0))
@@ -209,23 +171,14 @@ class Sheet(BOMHelper):
         cls.AddPiece(bb.XLength,bb.ZLength,kind)
         return sheet
     @classmethod
-    def YZSheet(cls,origin,width,length,sheettype="AB"):
+    def YZSheet(cls,origin,width,length,sheettype="CDX"):
         if not isinstance(origin,Base.Vector):
             raise RuntimeError("origin is not a Vector!")
         thick = None
         kind = None
-        if sheettype == "AB":
-            thick = cls.__AB3_8Thick
-            kind = "3/8 AB Plywood"
-        elif sheettype == "Birch":
-            thick = cls.__Birch1_4Thick
-            kind = "1/4 Birch Plywood"
-        elif sheettype == "Masonite":
-            thick = cls.__Masonite1_8Thick
-            kind = "1/8 Masonite"
-        elif sheettype == "Lexan":
-            thick = cls.__Lexan1_8Thick
-            kind = "1/8 Lexan"
+        if sheettype == "CDX":
+            thick = cls.__CDX3_8Thick
+            kind = "3/8 CDX Plywood"
         else:
             raise RuntimeError("Unsupport plywood type")
         sheet = Part.makePlane(width,length,origin.add(Base.Vector(0,length,0)),Base.Vector(1,0,0)).extrude(Base.Vector(thick,0,0))
@@ -233,4 +186,262 @@ class Sheet(BOMHelper):
         cls.AddPiece(bb.ZLength,bb.YLength,kind)
         return sheet
     
+class SpruceDimStock(BOMHelper):
+    __thick = Units.mm(1.5)
+    def __init__(self):
+        raise RuntimeError("No Instances allowed for SpruceDimStock!") 
+    @classmethod
+    def BoardThickness(cls):
+        return cls.__thick
+    __Color = (0xBA/255.0, 0x70/255.0, 0x0F/255.0)
+    @classmethod
+    def Color(cls):
+        return cls.__Color
+    @classmethod
+    def ZXBoard(cls,origin,width,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        board = Part.makePlane(width,length,origin,Base.Vector(0,1,0)).extrude(Base.Vector(0,cls.__thick,0))
+        bb = board.BoundBox
+        cls.AddPiece(bb.ZLength,bb.XLength,"2in Dimensional Stock")
+        return board
+    @classmethod
+    def YXBoard(cls,origin,width,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        board = Part.makePlane(width,length,origin,Base.Vector(0,0,1)).extrude(Base.Vector(0,0,cls.__thick))
+        bb = board.BoundBox
+        cls.AddPiece(bb.YLength,bb.XLength,"2in Dimensional Stock")
+        return board
+    @classmethod
+    def ZYBoard(cls,origin,width,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        board = Part.makePlane(width,length,origin.add(Base.Vector(0,length,0)),
+                               Base.Vector(1,0,0)) \
+                  .extrude(Base.Vector(cls.__thick,0,0))
+        bb = board.BoundBox
+        cls.AddPiece(bb.ZLength,bb.YLength,"2in Dimensional Stock")
+        return board
+    @classmethod
+    def XYBoard(cls,origin,width,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        board = Part.makePlane(width,length,origin,Base.Vector(0,0,1)).extrude(Base.Vector(0,0,cls.__thick))
+        bb = board.BoundBox
+        cls.AddPiece(bb.YLength,bb.XLength,"2in Dimensional Stock")
+        return board
+    @classmethod
+    def ZBeam(cls,origin,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        beam = Part.makePlane(cls.__thick,cls.__thick,origin,Base.Vector(0,0,1)).extrude(Base.Vector(0,0,length))
+        bb = beam.BoundBox
+        cls.AddPiece(bb.YLength,bb.ZLength,"2in Dimensional Stock")
+        return beam
+    @classmethod
+    def XBeam(cls,origin,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        beam = Part.makePlane(cls.__thick,cls.__thick,origin,Base.Vector(1,0,0)).extrude(Base.Vector(length,0,0))
+        bb = beam.BoundBox
+        cls.AddPiece(bb.YLength,bb.XLength,"2in Dimensional Stock")
+        return beam
+    @classmethod
+    def YBeam(cls,origin,length):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        beam = Part.makePlane(cls.__thick,cls.__thick,origin,Base.Vector(0,1,0)).extrude(Base.Vector(0,length,0))
+        bb = beam.BoundBox
+        cls.AddPiece(bb.XLength,bb.YLength,"2in Dimensional Stock")
+        return beam
 
+    
+## Chewy box: 24x17x6
+
+class DeliveryBox(object):
+    __OuterWidth = Units.mm(20)
+    __OuterLength = Units.mm(24)
+    __OuterHeight = Units.mm(30)
+    @property
+    def OuterLength(self):
+        return self.__OuterLength
+    @property
+    def OuterWidth(self):
+        return self.__OuterWidth
+    @property
+    def OuterHeight(self):
+        return self.__OuterHeight
+    def _XZFrame(self,origin,height,width):
+        a = SpruceDimStock.ZBeam(origin,height)
+        b = SpruceDimStock.XBeam(origin.add(
+                                   Base.Vector(SpruceDimStock.BoardThickness(),
+                                               SpruceDimStock.BoardThickness(),
+                                               0)),
+                                 width-(2*SpruceDimStock.BoardThickness()))
+        c = SpruceDimStock.ZBeam(origin.add(
+                                    Base.Vector(width-
+                                        SpruceDimStock.BoardThickness(),0,0)),
+                                  height)
+        d = SpruceDimStock.XBeam(origin.add(
+                                   Base.Vector(SpruceDimStock.BoardThickness(),
+                                               SpruceDimStock.BoardThickness(),
+                                               height-SpruceDimStock.BoardThickness())),
+                                 width-(2*SpruceDimStock.BoardThickness()))
+        return (a, b, c, d)
+    def __init__(self,name,origin):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        self.origin = origin
+        self.name = name
+        self.left_side = Sheet.YZSheet(self.origin,self.OuterHeight,
+                                       self.OuterLength)
+        self.right_side = Sheet.YZSheet(self.origin.add(
+                                            Base.Vector(self.OuterWidth-
+                                                        Sheet.CDXThick(),0,0)),
+                                        self.OuterHeight,
+                                        self.OuterLength)
+        self.front_side = Sheet.XZSheet(self.origin.add(
+                                            Base.Vector(Sheet.CDXThick(),0,0)),
+                                        self.OuterHeight,
+                                        self.OuterWidth-(2*Sheet.CDXThick()))
+        self.front_frame  = self._XZFrame(self.origin.add(
+                                        Base.Vector(Sheet.CDXThick(),
+                                                    Sheet.CDXThick(),0)),
+                                   self.OuterHeight,
+                                   self.OuterWidth-(2*Sheet.CDXThick()))
+        self.rear_side = Sheet.XZSheet(self.origin.add(
+                                          Base.Vector(Sheet.CDXThick(),
+                                                      self.OuterLength-
+                                                          Sheet.CDXThick(),0)),
+                                        self.OuterHeight,
+                                        self.OuterWidth-(2*Sheet.CDXThick()))
+        self.rear_frame = self._XZFrame(self.origin.add(
+                                        Base.Vector(Sheet.CDXThick(),
+                                                    self.OuterLength-
+                                                        Sheet.CDXThick()-
+                                                        SpruceDimStock.BoardThickness(),0)),
+                                   self.OuterHeight,
+                                   self.OuterWidth-(2*Sheet.CDXThick()))
+        self.left_bottom_ybeam = SpruceDimStock.YBeam(origin.add(Base.Vector(
+                                                    Sheet.CDXThick(),
+                                                    Sheet.CDXThick()+
+                                                    SpruceDimStock.BoardThickness(),
+                                                    0)),
+                                                    self.OuterLength-(2*(
+                                                        Sheet.CDXThick()+
+                                                        SpruceDimStock.BoardThickness())))
+        self.left_top_ybeam = SpruceDimStock.YBeam(origin.add(Base.Vector(
+                                                    Sheet.CDXThick(),
+                                                    Sheet.CDXThick()+
+                                                    SpruceDimStock.BoardThickness(),
+                                                    self.OuterHeight-
+                                                        SpruceDimStock.BoardThickness())),
+                                                    self.OuterLength-(2*(
+                                                        Sheet.CDXThick()+
+                                                        SpruceDimStock.BoardThickness())))
+        self.right_bottom_ybeam = SpruceDimStock.YBeam(origin.add(Base.Vector(
+                                                    self.OuterWidth-Sheet.CDXThick()-SpruceDimStock.BoardThickness(),
+                                                    Sheet.CDXThick()+
+                                                    SpruceDimStock.BoardThickness(),
+                                                    0)),
+                                                    self.OuterLength-(2*(
+                                                        Sheet.CDXThick()+
+                                                        SpruceDimStock.BoardThickness())))
+        self.right_top_ybeam = SpruceDimStock.YBeam(origin.add(Base.Vector(
+                                                    self.OuterWidth-Sheet.CDXThick()-SpruceDimStock.BoardThickness(),
+                                                    Sheet.CDXThick()+
+                                                    SpruceDimStock.BoardThickness(),
+                                                    self.OuterHeight-
+                                                        SpruceDimStock.BoardThickness())),
+                                                    self.OuterLength-(2*(
+                                                        Sheet.CDXThick()+
+                                                        SpruceDimStock.BoardThickness())))
+        self.bottom = Sheet.XYSheet(origin.add(Base.Vector(0,0,
+                                                           -Sheet.CDXThick())),
+                                    self.OuterWidth,
+                                    self.OuterLength)
+    def show(self,doc=None):
+        if doc==None:
+            doc = App.activeDocument()
+        obj = doc.addObject("Part::Feature",self.name+"_left_side")
+        obj.Shape = self.left_side
+        obj.Label=self.name+"_left_side"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+        obj = doc.addObject("Part::Feature",self.name+"_right_side")
+        obj.Shape = self.right_side
+        obj.Label=self.name+"_right_side"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+        obj = doc.addObject("Part::Feature",self.name+"_front_side")
+        obj.Shape = self.front_side
+        obj.Label=self.name+"_front_side"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+        obj = doc.addObject("Part::Feature",self.name+"_rear_side")
+        obj.Shape = self.rear_side
+        obj.Label=self.name+"_rear_side"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+        a, b, c, d = self.front_frame
+        obj = doc.addObject("Part::Feature",self.name+"_front_frame_a")
+        obj.Shape = a
+        obj.Label=self.name+"_front_frame_a"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_front_frame_b")
+        obj.Shape = b
+        obj.Label=self.name+"_front_frame_b"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_front_frame_c")
+        obj.Shape = c
+        obj.Label=self.name+"_front_frame_c"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_front_frame_d")
+        obj.Shape = d
+        obj.Label=self.name+"_front_frame_d"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        a, b, c, d = self.rear_frame
+        obj = doc.addObject("Part::Feature",self.name+"_rear_frame_a")
+        obj.Shape = a
+        obj.Label=self.name+"_rear_frame_a"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_rear_frame_b")
+        obj.Shape = b
+        obj.Label=self.name+"_rear_frame_b"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_rear_frame_c")
+        obj.Shape = c
+        obj.Label=self.name+"_rear_frame_c"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_rear_frame_d")
+        obj.Shape = d
+        obj.Label=self.name+"_rear_frame_d"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_left_bottom_ybeam")
+        obj.Shape = self.left_bottom_ybeam
+        obj.Label=self.name+"_left_bottom_ybeam"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_left_top_ybeam")
+        obj.Shape = self.left_top_ybeam
+        obj.Label=self.name+"_left_top_ybeam"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_right_bottom_ybeam")
+        obj.Shape = self.right_bottom_ybeam
+        obj.Label=self.name+"_right_bottom_ybeam"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_right_top_ybeam")
+        obj.Shape = self.right_top_ybeam
+        obj.Label=self.name+"_right_top_ybeam"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_bottom")
+        obj.Shape = self.bottom
+        obj.Label=self.name+"_bottom"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+
+if __name__ == '__main__':
+    if "BenchWork" in App.listDocuments().keys():
+        App.closeDocument("DeliveryBox")
+    doc = App.newDocument("DeliveryBox")
+    doc = App.activeDocument()
+    deliveryBox = DeliveryBox("DeliveryBox",Base.Vector(0,0,0))
+    deliveryBox.show(doc)
+    Gui.activeDocument().activeView().viewTop()
+    Gui.SendMsgToActiveView("ViewFit")
+    BOMHelper.ListCuts("BOM.csv")
