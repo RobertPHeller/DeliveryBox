@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260620.0904>
+#  Last Modified : <260620.1525>
 #
 #  Description	
 #
@@ -187,12 +187,20 @@ class Sheet(BOMHelper):
         return sheet
     
 class SpruceDimStock(BOMHelper):
-    __thick = Units.mm(1.5)
     def __init__(self):
         raise RuntimeError("No Instances allowed for SpruceDimStock!") 
+    __thick = Units.mm(1.5)
     @classmethod
     def BoardThickness(cls):
         return cls.__thick
+    __x4Width = Units.mm(3.5)
+    @classmethod
+    def X4Width(cls):
+        return cls.__x4Width    
+    __x6Width = Units.mm(5.5)
+    @classmethod
+    def X6Width(cls):
+        return cls.__x6Width    
     __Color = (0xBA/255.0, 0x70/255.0, 0x0F/255.0)
     @classmethod
     def Color(cls):
@@ -263,6 +271,7 @@ class DeliveryBox(object):
     __OuterWidth = Units.mm(20)
     __OuterLength = Units.mm(24)
     __OuterHeight = Units.mm(30)
+    __LegLength = Units.mm(3)
     @property
     def OuterLength(self):
         return self.__OuterLength
@@ -272,14 +281,29 @@ class DeliveryBox(object):
     @property
     def OuterHeight(self):
         return self.__OuterHeight
-    def _XZFrame(self,origin,height,width):
-        a = SpruceDimStock.ZBeam(origin,height)
+    @property
+    def LegLength(self):
+        return self.__LegLength
+    def _XZFrame(self,origin,height,width,addlegs=False):
+        if addlegs:
+            a = SpruceDimStock.ZBeam(origin.add(Base.Vector(0,0,
+                                                            -self.LegLength)),
+                                     height+self.LegLength)
+        else:
+            a = SpruceDimStock.ZBeam(origin,height)
         b = SpruceDimStock.XBeam(origin.add(
                                    Base.Vector(SpruceDimStock.BoardThickness(),
                                                SpruceDimStock.BoardThickness(),
                                                0)),
                                  width-(2*SpruceDimStock.BoardThickness()))
-        c = SpruceDimStock.ZBeam(origin.add(
+        if addlegs:
+            c = SpruceDimStock.ZBeam(origin.add(
+                                    Base.Vector(width-
+                                        SpruceDimStock.BoardThickness(),0,
+                                        -self.LegLength)),
+                                  height+self.LegLength)
+        else:
+            c = SpruceDimStock.ZBeam(origin.add(
                                     Base.Vector(width-
                                         SpruceDimStock.BoardThickness(),0,0)),
                                   height)
@@ -287,6 +311,20 @@ class DeliveryBox(object):
                                    Base.Vector(SpruceDimStock.BoardThickness(),
                                                SpruceDimStock.BoardThickness(),
                                                height-SpruceDimStock.BoardThickness())),
+                                 width-(2*SpruceDimStock.BoardThickness()))
+        return (a, b, c, d)
+    def _XYFrame(self,origin,width,length):
+        a = SpruceDimStock.YBeam(origin,length);
+        b = SpruceDimStock.XBeam(origin.add(
+                                   Base.Vector(SpruceDimStock.BoardThickness(),
+                                               SpruceDimStock.BoardThickness(),0)),
+                                 width-(2*SpruceDimStock.BoardThickness()))
+        c = SpruceDimStock.YBeam(origin.add(
+                                    Base.Vector(width-SpruceDimStock.BoardThickness(),
+                                                0,0)),length);
+        d = SpruceDimStock.XBeam(origin.add(
+                                   Base.Vector(SpruceDimStock.BoardThickness(),
+                                               length,0)),
                                  width-(2*SpruceDimStock.BoardThickness()))
         return (a, b, c, d)
     def __init__(self,name,origin):
@@ -322,7 +360,7 @@ class DeliveryBox(object):
                                                         Sheet.CDXThick()-
                                                         SpruceDimStock.BoardThickness(),0)),
                                    self.OuterHeight,
-                                   self.OuterWidth-(2*Sheet.CDXThick()))
+                                   self.OuterWidth-(2*Sheet.CDXThick()),True)
         self.left_bottom_ybeam = SpruceDimStock.YBeam(origin.add(Base.Vector(
                                                     Sheet.CDXThick(),
                                                     Sheet.CDXThick()+
@@ -361,6 +399,27 @@ class DeliveryBox(object):
                                                            -Sheet.CDXThick())),
                                     self.OuterWidth,
                                     self.OuterLength)
+        self.bottom = self.bottom.cut(
+            self.rear_frame[0]).cut(
+            self.rear_frame[2])
+        self.lid_frame = self._XYFrame(origin.add(
+                                        Base.Vector(0,0,self.OuterHeight)),
+                                       self.OuterWidth,
+                                       self.OuterLength)
+        self.lid = Sheet.XYSheet(origin.add(
+                                  Base.Vector(0,0,self.OuterHeight+
+                                             SpruceDimStock.BoardThickness())),
+                                 self.OuterWidth,
+                                 self.OuterLength)
+        self.lid_lockboard = SpruceDimStock.XYBoard(
+                            origin.add(
+                               Base.Vector((self.OuterWidth/2)-
+                                               (SpruceDimStock.X4Width()/2),
+                                            SpruceDimStock.BoardThickness(),
+                                            self.OuterHeight)),
+                            SpruceDimStock.X4Width(),
+                            self.OuterLength-
+                                           (2*SpruceDimStock.BoardThickness()))
     def show(self,doc=None):
         if doc==None:
             doc = App.activeDocument()
@@ -434,7 +493,32 @@ class DeliveryBox(object):
         obj.Shape = self.bottom
         obj.Label=self.name+"_bottom"
         obj.ViewObject.ShapeColor=Sheet.Color()        
-
+        a, b, c, d = self.lid_frame
+        obj = doc.addObject("Part::Feature",self.name+"_lid_frame_a")
+        obj.Shape = a
+        obj.Label=self.name+"_lid_frame_a"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_lid_frame_b")
+        obj.Shape = b
+        obj.Label=self.name+"_lid_frame_b"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_lid_frame_c")
+        obj.Shape = c
+        obj.Label=self.name+"_lid_frame_c"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_lid_frame_d")
+        obj.Shape = d
+        obj.Label=self.name+"_lid_frame_d"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        obj = doc.addObject("Part::Feature",self.name+"_lid")
+        obj.Shape = self.lid
+        obj.Label=self.name+"_lid"
+        obj.ViewObject.ShapeColor=Sheet.Color()        
+        obj = doc.addObject("Part::Feature",self.name+"_lid_lockboard")
+        obj.Shape = self.lid_lockboard
+        obj.Label=self.name+"_lid_lockboard"
+        obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        
 if __name__ == '__main__':
     if "BenchWork" in App.listDocuments().keys():
         App.closeDocument("DeliveryBox")
