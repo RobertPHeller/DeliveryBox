@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260620.1525>
+#  Last Modified : <260620.1529>
 #
 #  Description	
 #
@@ -328,6 +328,7 @@ class DeliveryBox(object):
                                  width-(2*SpruceDimStock.BoardThickness()))
         return (a, b, c, d)
     def __init__(self,name,origin):
+        ## Wood parts (3/8 CDX and 2" dim stock (2x2 and 2x4))
         if not isinstance(origin,Base.Vector):
             raise RuntimeError("origin is not a Vector!")
         self.origin = origin
@@ -420,6 +421,7 @@ class DeliveryBox(object):
                             SpruceDimStock.X4Width(),
                             self.OuterLength-
                                            (2*SpruceDimStock.BoardThickness()))
+        ## Hardware: wheels, lock, handle, hinge, etc.
     def show(self,doc=None):
         if doc==None:
             doc = App.activeDocument()
