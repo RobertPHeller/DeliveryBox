@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 15:30:41
-//  Last Modified : <260618.1552>
+//  Last Modified : <260619.1343>
 //
 //  Description	
 //
@@ -53,7 +53,9 @@
 namespace Display {
 
 
-/** Display digits and characters. */
+/** Display digits and characters. 
+ * Wrapped around the Adafruit_AlphaNum4 / Adafruit_LEDBackpack class.
+ */
 class Display : public Adafruit_AlphaNum4, public Singleton<Display>
 {
 public:

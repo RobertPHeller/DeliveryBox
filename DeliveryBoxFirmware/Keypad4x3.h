@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 16:37:26
-//  Last Modified : <260619.0759>
+//  Last Modified : <260619.1342>
 //
 //  Description	
 //
@@ -51,10 +51,15 @@
 
 namespace Keypad4x3 {
 
+/** Specialized 4x3 keypad.
+ * See the documentation for the Adafruit_Keypad class for actual API.
+ */
 class Keypad4x3 : public Adafruit_Keypad, public Singleton<Keypad4x3>
 {
 public:
+    /** Constructor. */
     Keypad4x3();
+    /** Initializer */
     static void Initialize()
     {
         instance()->begin();

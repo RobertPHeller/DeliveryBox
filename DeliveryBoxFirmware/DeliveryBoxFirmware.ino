@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 06:23:17
-//  Last Modified : <260619.1121>
+//  Last Modified : <260619.1358>
 //
 //  Description	
 //
@@ -54,7 +54,7 @@
  * The lock uses 8-digit codes to unlock the box.  There is one master code 
  * and any number of one-time codes.  The one time codes are given to delivery
  * drivers when a delivery is scheduled.  Once the driver uses the code to 
- * deliver the parcel, the code is removed.
+ * deliver the parcel, the code is removed and can't be used again.
  */
 
 static const char rcsid[] = "@(#) : $Id$";

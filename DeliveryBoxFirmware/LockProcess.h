@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 20:56:22
-//  Last Modified : <260619.0827>
+//  Last Modified : <260619.1350>
 //
 //  Description	
 //
@@ -55,22 +55,42 @@
 
 namespace LockProcess {
 
+/** Class to manage locking and unlocking and storing the unlock codes.
+ * Manages one master code and any number of one-time codes.
+ */
 class LockProcess : public Singleton<LockProcess>
 {
 public:
+    /** Constructor. */
     LockProcess();
+    /** Initializer.  Loads the codes from SPIFFS (SPI Flash File System).
+     */
     static void Initialize()
     {
         instance()->_begin();
     }
+    /** Process a key. If enough digits have been entered and if they match
+     * a code, unlock the box.
+     * If the box is unlocked and three stars (*) have been entered, lock the
+     * box.
+     * @param k The entered key (0-9, # and *).
+     */
     static void ProcessKey(uint8_t k)
     {
         instance()->_processKey(k);
     }
+    /** Set the master code.
+     * Saves a new master code to the SPIFFS (SPI Flash File System).
+     * @param newcode The new code.
+     */
     static void SetMasterCode(String newcode)
     {
         instance()->_setmaster(newcode);
     }
+    /** Add a one time code.
+     * Appends a one time code to the end of the list of one time codes.
+     * @param newcode The new code. 
+     */
     static void AddOneTimeCode(String newcode)
     {
         instance()->_addonetime(newcode);
