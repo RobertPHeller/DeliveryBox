@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260620.1529>
+#  Last Modified : <260620.1948>
 #
 #  Description	
 #
@@ -51,6 +51,7 @@ sys.path.append(os.path.dirname(__file__))
 import Units
 from debug import debug
 import datetime                                                                 
+from PianoHinge import *
 
 import time
 
@@ -422,6 +423,14 @@ class DeliveryBox(object):
                             self.OuterLength-
                                            (2*SpruceDimStock.BoardThickness()))
         ## Hardware: wheels, lock, handle, hinge, etc.
+        self.hinge = PianoHingeFlatOutsideBack(self.name+"_hinge",
+                                               origin.add(
+                        Base.Vector((self.OuterWidth-
+                                        PianoHingeFlatOutsideBack.Length())/2,
+                                    self.OuterLength,
+                                    self.OuterHeight-
+                                       PianoHingeFlatOutsideBack.FlangeWidth()-
+                                       (PianoHingeFlatOutsideBack.PinDia()/2))))
     def show(self,doc=None):
         if doc==None:
             doc = App.activeDocument()
@@ -520,6 +529,7 @@ class DeliveryBox(object):
         obj.Shape = self.lid_lockboard
         obj.Label=self.name+"_lid_lockboard"
         obj.ViewObject.ShapeColor=SpruceDimStock.Color()
+        self.hinge.show(doc)
         
 if __name__ == '__main__':
     if "BenchWork" in App.listDocuments().keys():
@@ -528,6 +538,6 @@ if __name__ == '__main__':
     doc = App.activeDocument()
     deliveryBox = DeliveryBox("DeliveryBox",Base.Vector(0,0,0))
     deliveryBox.show(doc)
-    Gui.activeDocument().activeView().viewTop()
+    Gui.activeDocument().activeView().viewRear()
     Gui.SendMsgToActiveView("ViewFit")
     BOMHelper.ListCuts("BOM.csv")
