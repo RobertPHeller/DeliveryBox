@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "LEDControlers")(type "KiCad")(uri "${KIPRJMOD}/LEDControlers.kicad_sym")(options "")(descr ""))
+  (lib (name "LED_Displys")(type "KiCad")(uri "${KIPRJMOD}/LED_Displys.kicad_sym")(options "")(descr ""))
+)
