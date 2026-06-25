@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260620.1948>
+#  Last Modified : <260622.0802>
 #
 #  Description	
 #
@@ -133,7 +133,7 @@ class BOMHelper(object):
 class Sheet(BOMHelper):
     def __init__(self):
         raise RuntimeError("No Instances allowed for Sheet")
-    __CDX3_8Thick = Units.mm(7/32)
+    __CDX3_8Thick = Units.mm(11/32)
     @classmethod
     def CDXThick(cls):
         return cls.__CDX3_8Thick
