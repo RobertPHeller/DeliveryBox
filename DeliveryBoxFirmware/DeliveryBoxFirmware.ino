@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 06:23:17
-//  Last Modified : <260619.1358>
+//  Last Modified : <260627.0904>
 //
 //  Description	
 //
@@ -62,6 +62,7 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Arduino.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#include "BluetoothSerial.h"
 #include <ESPmDNS.h>
 #include <Adafruit_Keypad.h>
 #include <Adafruit_LEDBackpack.h>

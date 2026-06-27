@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 16:08:41
-//  Last Modified : <260617.1613>
+//  Last Modified : <260627.1126>
 //
 //  Description	
 //
@@ -47,11 +47,22 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Arduino.h>
 #include <WebServer.h>
 #include <WiFi.h>
+#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
+#include <BluetoothSerial.h>
+#else
+#include "Bluetooth_UART.h"
+#endif
 #include <ESPmDNS.h>
 #include "Networking.h"
 #include "DeliveryBoxWebserver.h"
 #include <FS.h>
 #include <SPIFFS.h>
+
+#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
+BluetoothSerial SerialBT;
+#else
+Bluetooth_UART SerialBT;
+#endif
 
 #define HOSTNAME "deliverybox"
 
@@ -70,66 +81,38 @@ void Initialize()
     if (fp)
     {
         rgbLedWrite(RGB_BUILTIN,255,255,0);
-        char *p = ssid;
-        int space = sizeof(ssid);
-        int ch;
-        do {
-            ch = fp.read();
-            if (ch < 0) break;
-            if (ch == '\r' || ch == '\n') break;
-            *p++ = (char) ch; space--;
-        } while (space > 1);
-        *p++ = '\0';
-        p = passPhrase;
-        space = sizeof(passPhrase);
-        do {
-            ch = fp.read();
-            if (ch < 0) break;
-            if (ch == '\r' || ch == '\n') 
-            {
-                if (p > passPhrase) break;
-            }
-            else
-            {
-                *p++ = (char) ch;
-                space--;
-            }
-        } while (space > 1);
-        *p++ = '\0'; 
+        int l = fp.readBytesUntil('\r',ssid,sizeof(ssid));
+        ssid[l] = '\0';
+        if (fp.peek() == '\n') fp.read();
+        l = fp.readBytesUntil('\r',passPhrase,sizeof(passPhrase));
+        passPhrase[l] = '\0';
         fp.close();
+    }
+    else if (SerialBT.begin(HOSTNAME))
+    {
+        SerialBT.printf("SSID: ");SerialBT.flush();
+        int l = SerialBT.readBytesUntil('\r',ssid,sizeof(ssid));
+        ssid[l] = '\0';
+        SerialBT.printf("Password: "); SerialBT.flush();
+        l = SerialBT.readBytesUntil('\r',passPhrase,sizeof(passPhrase)); 
+        passPhrase[l] = '\0';
+        SerialBT.printf("\nOK\n");
+        fp = SPIFFS.open("/secrets.txt", FILE_WRITE);
+        fp.println(ssid);
+        fp.println(passPhrase);
+        fp.close();
+        SerialBT.printf("/secrets.txt written.");
     }
     else
     {
         rgbLedWrite(RGB_BUILTIN,0,255,255);
         Serial.printf("/secrets.txt not found!, enter SSID and passPhrase\n");
-        char *p = ssid;
-        int space = sizeof(ssid);
-        int ch;
-        Serial.printf("ssid: ");
-        do {
-            ch = Serial.read();
-            if (ch < 0) break;
-            if (ch == '\r' || ch == '\n') break;
-            *p++ = (char) ch; space--;
-        } while (space > 1);
-        *p++ = '\0';
-        Serial.printf("\npassPhrase: ");
-        p = passPhrase;
-        space = sizeof(passPhrase);
-        do {
-            ch = Serial.read();
-            if (ch < 0) break;
-            if (ch == '\r' || ch == '\n')
-            {
-                if (p > passPhrase) break;
-            }
-            else
-            {
-                *p++ = (char) ch;
-                space--;
-            } 
-        } while (space > 1); 
-        *p++ = '\0';
+        Serial.printf("SSID: ");Serial.flush(); 
+        int l = Serial.readBytesUntil('\r',ssid,sizeof(ssid));
+        ssid[l] = '\0';
+        Serial.printf("\npassPhrase: ");Serial.flush();
+        l = Serial.readBytesUntil('\r',passPhrase,sizeof(passPhrase));
+        passPhrase[l] = '\0';
         Serial.printf("\nOK\n");
         fp = SPIFFS.open("/secrets.txt", FILE_WRITE);
         fp.println(ssid);

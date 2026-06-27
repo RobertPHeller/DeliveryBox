@@ -1,0 +1,164 @@
+// -!- C++ -!- //////////////////////////////////////////////////////////////
+//
+//  System        : 
+//  Module        : 
+//  Object Name   : $RCSfile$
+//  Revision      : $Revision$
+//  Date          : $Date$
+//  Author        : $Author$
+//  Created By    : Robert Heller
+//  Created       : 2026-06-27 11:48:51
+//  Last Modified : <260627.1952>
+//
+//  Description	
+//
+//  Notes
+//
+//  History
+//	
+/////////////////////////////////////////////////////////////////////////////
+/// @copyright
+///    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
+///			51 Locke Hill Road
+///			Wendell, MA 01379-9728
+///
+///    This program is free software; you can redistribute it and/or modify
+///    it under the terms of the GNU General Public License as published by
+///    the Free Software Foundation; either version 2 of the License, or
+///    (at your option) any later version.
+///
+///    This program is distributed in the hope that it will be useful,
+///    but WITHOUT ANY WARRANTY; without even the implied warranty of
+///    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///    GNU General Public License for more details.
+///
+///    You should have received a copy of the GNU General Public License
+///    along with this program; if not, write to the Free Software
+///    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+/// @file Bluetooth_UART.cpp
+/// @author Robert Heller
+/// @date 2026-06-27 11:48:51
+/// 
+///
+//////////////////////////////////////////////////////////////////////////////
+
+static const char rcsid[] = "@(#) : $Id$";
+
+
+#include <Arduino.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+#include <Stream.h>
+#include "Bluetooth_UART.h"
+
+#define SERVICE_UUID           "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"  // UART service UUID
+#define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+#define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+
+bool Bluetooth_UART::begin(const char* name)
+{
+    // Create the BLE Device
+    BLEDevice::init("UART Service");
+    
+    // Create the BLE Server
+    pServer = BLEDevice::createServer();
+    pServer->setCallbacks(new UARTServerCallbacks(this));
+    
+    // Create the BLE Service
+    BLEService *pService = pServer->createService(SERVICE_UUID);
+    
+    // Create a BLE Characteristic
+    pTxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, BLECharacteristic::PROPERTY_NOTIFY);
+    
+    // Descriptor 2902 is not required when using NimBLE as it is automatically added based on the characteristic properties
+#ifndef CONFIG_BT_NIMBLE_ENABLED
+    pTxCharacteristic->addDescriptor(new BLE2902());
+#endif
+    
+    pRxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_RX, BLECharacteristic::PROPERTY_WRITE);
+    
+    pRxCharacteristic->setCallbacks(new UARTCallbacks(this));
+    
+    // Start the service
+    pService->start();
+    
+    // Start advertising
+    pServer->getAdvertising()->start();
+    //Serial.println("Waiting a client connection to notify...");
+    // Wait for a connection
+    while (!deviceConnected)
+        delay(1000);
+    return true;
+}
+
+int Bluetooth_UART::available(void)
+{
+    return rx_fifo.Available();
+}
+
+int Bluetooth_UART::peek(void)
+{
+    uint8_t peekbuffer;
+    if (rx_fifo.Peek(&peekbuffer) > 0)
+        return peekbuffer;
+    else
+        return -1;
+}
+
+int Bluetooth_UART::read(void)
+{
+    uint8_t readbuffer;
+    if (rx_fifo.Receive(&readbuffer) > 0)
+        return readbuffer;
+    else
+        return -1;
+}
+
+size_t Bluetooth_UART::readBytes(char *buffer, size_t length)
+{
+    size_t result = 0;
+    char *p;
+    while (rx_fifo.Available() > 0 && result < length)
+    {
+        rx_fifo.Receive((uint8_t *)p++);
+        result++;
+    }
+    return result;
+}
+
+size_t Bluetooth_UART::write(uint8_t c)
+{
+    tx_fifo.Send(c);
+    if (c == '\n' || tx_fifo.Available() > BUFFER_SIZE) flush();
+    return 1;
+}
+
+size_t Bluetooth_UART::write(const uint8_t *buffer, size_t size)
+{
+    int result = 0;
+    while (size > 0)
+    {
+        tx_fifo.Send(*buffer++);
+        size--;
+        result++;
+    }
+    return result;
+}
+
+void Bluetooth_UART::flush()
+{
+    while (tx_fifo.Available() > 0)
+    {
+        size_t bsize = tx_fifo.Available();
+        if (bsize > BUFFER_SIZE) bsize = BUFFER_SIZE;
+        for (auto i = 0; i < bsize; i++)
+        {
+            tx_fifo.Receive(&buffer[i]);
+        }
+        pTxCharacteristic->setValue(buffer,bsize);
+        pTxCharacteristic->notify();
+    }
+}
+
