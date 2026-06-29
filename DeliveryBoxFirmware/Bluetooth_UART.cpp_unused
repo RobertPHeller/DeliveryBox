@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-27 11:48:51
-//  Last Modified : <260627.1952>
+//  Last Modified : <260628.0738>
 //
 //  Description	
 //
@@ -70,14 +70,16 @@ bool Bluetooth_UART::begin(const char* name)
     BLEService *pService = pServer->createService(SERVICE_UUID);
     
     // Create a BLE Characteristic
-    pTxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, BLECharacteristic::PROPERTY_NOTIFY);
+    pTxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_TX, 
+                                                       BLECharacteristic::PROPERTY_NOTIFY|BLECharacteristic::PROPERTY_READ);
     
     // Descriptor 2902 is not required when using NimBLE as it is automatically added based on the characteristic properties
 #ifndef CONFIG_BT_NIMBLE_ENABLED
     pTxCharacteristic->addDescriptor(new BLE2902());
 #endif
     
-    pRxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_RX, BLECharacteristic::PROPERTY_WRITE);
+    pRxCharacteristic = pService->createCharacteristic(CHARACTERISTIC_UUID_RX, 
+                                                       BLECharacteristic::PROPERTY_WRITE);
     
     pRxCharacteristic->setCallbacks(new UARTCallbacks(this));
     
@@ -88,9 +90,12 @@ bool Bluetooth_UART::begin(const char* name)
     pServer->getAdvertising()->start();
     //Serial.println("Waiting a client connection to notify...");
     // Wait for a connection
-    while (!deviceConnected)
+    int count = 60;
+    while (!deviceConnected && count-- > 0)
+    {
         delay(1000);
-    return true;
+    }
+    return deviceConnected;
 }
 
 int Bluetooth_UART::available(void)

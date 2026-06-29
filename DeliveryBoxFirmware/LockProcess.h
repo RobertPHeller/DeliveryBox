@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 20:56:22
-//  Last Modified : <260619.1350>
+//  Last Modified : <260628.2045>
 //
 //  Description	
 //
@@ -95,6 +95,10 @@ public:
     {
         instance()->_addonetime(newcode);
     }
+    static void DisplayCurrentLockState()
+    {
+        instance()->_displayCurrentLockState();
+    }
 private:
     void _begin();
     void _loadMasterCode();
@@ -104,6 +108,7 @@ private:
     void _setmaster(String newcode);
     void _addonetime(String newcode);
     void _rewriteOneTimeCodes();
+    void _displayCurrentLockState();
     static constexpr size_t CODELEN = 9;
     char _buffer[CODELEN];
     size_t _bufferIndex;

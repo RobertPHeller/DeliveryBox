@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Delivery Box Bluetooth App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <h1>Delivery Box Bluetooth App</h1>
+  <button id="connectBleButton">Connect to Delivery Box</button>
+  <button id="disconnectBleButton">Disconnect from Delivery Box</button>
+  <p>BLE state: <strong><span id="bleState" style="color:#d13a30;">Disconnected</span></strong></p>
+  <h2>WiFi Configuration</h2>
+  <ul style="list-style-type: none;">
+    <li><label for="ssid">SSID: </label><input type="text" id="ssid" name="ssid" /></li>
+    <li><label for="passcode">Password: </label><input type="password" id="passcode" name="passcode" /></li>
+    <li><button type="submit" id="wifiSettingMessage">Configure WiFi</button></li>
+  </ul>
+  <h2>Set Master Code</h2>
+  <ul style="list-style-type: none;">
+    <li><label for="master-code">Master Code: </label><input type="number" id="master-code" name="master-code" size="8" maxlength="8" /></li>
+    <li><button type="submit" id="MasterCodeMessage">Set Master Code</button></li>
+  </ul>
+  <h2>Add One Time Code</h2>
+  <ul style="list-style-type: none;">
+    <li><label for="one-time">One Time Code: </label><input type="number" id="one-time" name="one-time" size="8" maxlength="8" /></li>
+    <li><button type="submit" id="OneTimeCodeMessage">Add One Time Code</button></li>
+  </ul>
+  <h2>Reboot</h2>
+  <button type="submit" id="RebootMessage">Reboot</button>
+</body>
+<script>
+    // DOM Elements
+    const connectButton = document.getElementById('connectBleButton');
+    const disconnectButton = document.getElementById('disconnectBleButton');
+    const bleStateContainer = document.getElementById('bleState');
+    //
+    const ssidInput = document.getElementById('ssid');
+    const passcodeInput = document.getElementById('passcode');
+    const WiFiMessageButton = document.getElementById('wifiSettingMessage');
+    //
+    const masterCodeInput = document.getElementById('master-code');
+    const MasterCodeMessageButton = document.getElementById('MasterCodeMessage');
+    //
+    const OneTimeCodeInput = document.getElementById('one-time');
+    const OneTimeCodeMessageButton = document.getElementById('OneTimeCodeMessage');
+    //
+    const RebootMessageButton = document.getElementById('RebootMessage');
+    
+    //Define BLE Device Specs
+    var deviceName ='Delivery Box';
+    var bleService = '3a6089ff-731f-4312-9761-6ecfa14b867e';
+    var WiFiCharacteristic = '00e19a26-da6e-4ad2-896c-b5f0cbe04e43';
+    var MasterCodeCharacteristic = 'fb90b3be-e21c-4aca-ae29-c05a0c3992e3';
+    var OneTimeCodeCharacteristic = '3d32154a-50f1-4e7d-883e-2b95ad680d3f';
+    var RestartCharacteristic = '2f1c6d70-9d97-47d7-8c9b-cb0b96bddea6';
+    
+    //Global Variables to Handle Bluetooth
+    var bleServer;
+    var bleServiceFound;
+    
+    // Connect Button (search for BLE Devices only if BLE is available)
+    connectButton.addEventListener('click', (event) => {
+        if (isWebBluetoothEnabled()){
+            connectToDevice();
+        }
+    });
+
+    // Disconnect Button
+    disconnectButton.addEventListener('click', disconnectDevice);
+    
+    WiFiMessageButton.addEventListener('click', 
+                                       () => writeWiFiMessage(ssidInput.value,
+                                                              passcodeInput.value));
+    MasterCodeMessageButton.addEventListener('click',
+                                             () => writeMasterCodeMessage(masterCodeInput.value));
+    
+    OneTimeCodeMessageButton.addEventListener('click',
+                                              () => writeOneTimeCodeMessage(OneTimeCodeInput.value));
+    
+    RebootMessageButton.addEventListener('click',
+                                         () => writeRebootMessage());
+    
+    // Check if BLE is available in your Browser
+    function isWebBluetoothEnabled() {
+        if (!navigator.bluetooth) {
+            console.log("Web Bluetooth API is not available in this browser!");
+            bleStateContainer.innerHTML = "Web Bluetooth API is not available in this browser!";
+            return false
+        }
+        console.log('Web Bluetooth API supported in this browser.');
+        return true
+    }
+
+    // Connect to BLE Device and Enable Notifications
+    function connectToDevice(){
+        console.log('Initializing Bluetooth...');
+        navigator.bluetooth.requestDevice({
+            filters: [{name: deviceName}],
+            optionalServices: [bleService]
+        })
+        .then(device => {
+            console.log('Device Selected:', device.name);
+            bleStateContainer.innerHTML = 'Connected to device ' + device.name;
+            bleStateContainer.style.color = "#24af37";
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+            return device.gatt.connect();
+        })
+        .catch(error => {
+            console.log('Error: ', error);
+        })
+    }
+
+    function onDisconnected(event){
+        console.log('Device Disconnected:', event.target.device.name);
+        bleStateContainer.innerHTML = "Device disconnected";
+        bleStateContainer.style.color = "#d13a30";
+
+        connectToDevice();
+    }
+
+    function writeWiFiMessage(ssid, password) {
+      if (bleServer && bleServer.connected) {
+        bleServiceFound.getCharacteristic(WiFiCharacteristic)
+        .then(characteristic => {
+              console.log("Found the WiFi Characteristic: ", characteristic);
+              const data = ssid + "\n" + password;
+              return characteristic.writeValue(data);
+            })
+                      .catch(error => {
+                console.error("Error writing to the WiFi characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+    
+    function writeMasterCodeMessage(masterCode) {
+      if (bleServer && bleServer.connected) {
+        bleServiceFound.getCharacteristic(MasterCodeCharacteristic)
+        .then(characteristic => {
+              console.log("Found the Master Code Characteristic: ", characteristic);
+              return characteristic.writeValue(masterCode);
+            })
+                      .catch(error => {
+                console.error("Error writing to the Master Code characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+    
+    function writeOneTimeCodeMessage(oneTimeCode) {
+      if (bleServer && bleServer.connected) {
+        bleServiceFound.getCharacteristic(OneTimeCodeCharacteristic)
+        .then(characteristic => {
+              console.log("Found the One Time Code Characteristic: ", characteristic);
+              return characteristic.writeValue(oneTimeCode);
+            })
+                      .catch(error => {
+                console.error("Error writing to the One Time Code characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+    
+    function writeRebootMessage() {
+      if (bleServer && bleServer.connected) {
+        bleServiceFound.getCharacteristic(RestartCharacteristic)
+        .then(characteristic => {
+              console.log("Found the Restart Characteristic: ", characteristic);
+              const data = "REBOOT";
+              return characteristic.writeValue(data);
+            })
+                      .catch(error => {
+                console.error("Error writing to the Restart characteristic: ", error);
+            });
+        } else {
+            console.error ("Bluetooth is not connected. Cannot write to characteristic.")
+            window.alert("Bluetooth is not connected. Cannot write to characteristic. \n Connect to BLE first!")
+        }
+    }
+    
+    function disconnectDevice() {
+        console.log("Disconnect Device.");
+        if (bleServer && bleServer.connected) {
+            if (sensorCharacteristicFound) {
+                sensorCharacteristicFound.stopNotifications()
+                    .then(() => {
+                        console.log("Notifications Stopped");
+                        return bleServer.disconnect();
+                    })
+                    .then(() => {
+                        console.log("Device Disconnected");
+                        bleStateContainer.innerHTML = "Device Disconnected";
+                        bleStateContainer.style.color = "#d13a30";
+
+                    })
+                    .catch(error => {
+                        console.log("An error occurred:", error);
+                    });
+            } else {
+                console.log("No characteristic found to disconnect.");
+            }
+        } else {
+            // Throw an error if Bluetooth is not connected
+            console.error("Bluetooth is not connected.");
+            window.alert("Bluetooth is not connected.")
+        }
+    }
+
+    
+  </script>    
+</html>
+

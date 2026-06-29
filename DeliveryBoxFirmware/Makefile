@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-17 06:24:54
-#  Last Modified : <260619.0817>
+#  Last Modified : <260628.1700>
 #
 #  Description	
 #
@@ -56,7 +56,7 @@ PORT  = /dev/ttyUSB0
 
 all: $(TARGET) DOC
 
-$(TARGET): $(INO) $(SOURCES) Revision.h partitions.csv
+$(TARGET): $(INO) $(SOURCES) Revision.h partitions.csv GeneratedPassKey.h
 	-mkdir Build
 	arduino --verbose --verify \
 		--board esp32:esp32:$(BOARD) \
@@ -73,6 +73,10 @@ upload: $(TARGET)
 		
 Revision.h: FORCE 
 	python3 ./Revision.py -d -t -H -U
+
+GeneratedPassKey.h:
+	python3 ./GeneratePassKey.py 
+
 
 DOC: $(TARGET) Doxyfile
 	-rm -rf latex html

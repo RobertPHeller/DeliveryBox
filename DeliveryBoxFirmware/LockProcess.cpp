@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-18 21:08:59
-//  Last Modified : <260619.0830>
+//  Last Modified : <260629.1106>
 //
 //  Description	
 //
@@ -146,6 +146,7 @@ void LockProcess::_addonetime(String newcode)
 
 void LockProcess::_message(const char *m)
 {
+    Display::Display::ClearDisplay();
     for (const char *p = m; *p; p++)
     {
         Display::Display::WriteCharacter((uint8_t) *p);
@@ -200,6 +201,16 @@ void LockProcess::_processKey(uint8_t k)
     }
 }
 
-
+void LockProcess::_displayCurrentLockState()
+{
+    if (LockServo::LockServo::IsLocked())
+    {
+        _message(LOCKED);
+    }
+    else
+    {
+        _message(UNLOCKED);
+    }
+}
         
 }

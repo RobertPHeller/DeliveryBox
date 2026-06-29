@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 16:08:41
-//  Last Modified : <260627.1126>
+//  Last Modified : <260628.2026>
 //
 //  Description	
 //
@@ -47,10 +47,13 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <Arduino.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
-#include <BluetoothSerial.h>
-#else
-#include "Bluetooth_UART.h"
+#ifdef CONFIG_BT_ENABLED
+//#ifdef CONFIG_BLUEDROID_ENABLED
+//#include <BluetoothSerial.h>
+//#else
+//#include "Bluetooth_UART.h"
+//#endif
+#include "Bluetooth_ConfigServer.h"
 #endif
 #include <ESPmDNS.h>
 #include "Networking.h"
@@ -58,11 +61,13 @@ static const char rcsid[] = "@(#) : $Id$";
 #include <FS.h>
 #include <SPIFFS.h>
 
-#if defined(CONFIG_BT_ENABLED) && defined(CONFIG_BLUEDROID_ENABLED)
-BluetoothSerial SerialBT;
-#else
-Bluetooth_UART SerialBT;
-#endif
+//#ifdef CONFIG_BT_ENABLED
+//#ifdef CONFIG_BLUEDROID_ENABLED
+//BluetoothSerial SerialBT;
+//#else
+//Bluetooth_UART SerialBT;
+//#endif
+//#endif
 
 #define HOSTNAME "deliverybox"
 
@@ -74,7 +79,9 @@ static char passPhrase[128] = "";
 
 void Initialize()
 {
-
+#ifdef CONFIG_BT_ENABLED
+    Bluetooth_ConfigServer::StartServer();
+#endif
     // allow to address the device by the given name e.g. http://deliverybox
     WiFi.setHostname(HOSTNAME);
     File fp = SPIFFS.open("/secrets.txt");
@@ -88,21 +95,23 @@ void Initialize()
         passPhrase[l] = '\0';
         fp.close();
     }
-    else if (SerialBT.begin(HOSTNAME))
-    {
-        SerialBT.printf("SSID: ");SerialBT.flush();
-        int l = SerialBT.readBytesUntil('\r',ssid,sizeof(ssid));
-        ssid[l] = '\0';
-        SerialBT.printf("Password: "); SerialBT.flush();
-        l = SerialBT.readBytesUntil('\r',passPhrase,sizeof(passPhrase)); 
-        passPhrase[l] = '\0';
-        SerialBT.printf("\nOK\n");
-        fp = SPIFFS.open("/secrets.txt", FILE_WRITE);
-        fp.println(ssid);
-        fp.println(passPhrase);
-        fp.close();
-        SerialBT.printf("/secrets.txt written.");
-    }
+//#ifdef CONFIG_BT_ENABLED
+//    else if (SerialBT.begin(HOSTNAME))
+//    {
+//        SerialBT.printf("SSID: ");SerialBT.flush();
+//        int l = SerialBT.readBytesUntil('\r',ssid,sizeof(ssid));
+//        ssid[l] = '\0';
+//        SerialBT.printf("Password: "); SerialBT.flush();
+//        l = SerialBT.readBytesUntil('\r',passPhrase,sizeof(passPhrase)); 
+//        passPhrase[l] = '\0';
+//        SerialBT.printf("\nOK\n");
+//        fp = SPIFFS.open("/secrets.txt", FILE_WRITE);
+//        fp.println(ssid);
+//        fp.println(passPhrase);
+//        fp.close();
+//        SerialBT.printf("/secrets.txt written.");
+//    }
+//#endif
     else
     {
         rgbLedWrite(RGB_BUILTIN,0,255,255);
