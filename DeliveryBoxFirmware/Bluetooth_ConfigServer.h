@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-28 12:32:21
-//  Last Modified : <260629.1416>
+//  Last Modified : <260629.2046>
 //
 //  Description	
 //
@@ -53,6 +53,8 @@
 #include "LockProcess.h"
 #include <SPIFFS.h>
 #include <FS.h>
+#include <stdio.h>
+#include "Display.h"
 
 
 #define SERVICE_UUID "3a6089ff-731f-4312-9761-6ecfa14b867e"
@@ -90,18 +92,24 @@ private:
     class SecurityCallbacks : public BLESecurityCallbacks {
 #if defined(CONFIG_BLUEDROID_ENABLED)  
         void onAuthenticationComplete(esp_ble_auth_cmpl_t desc) override {
-            // Print the IRK received by the peer  
-            BLEAddress peerAddr(desc.bd_addr);
-            // get_peer_irk(peerAddr);
+            LockProcess::LockProcess::DisplayCurrentLockState();
         }
 #endif
 #if defined(CONFIG_NIMBLE_ENABLED)
         void onAuthenticationComplete(ble_gap_conn_desc *desc) override {
-            // Print the IRK received by the peer
-            BLEAddress peerAddr(desc->peer_id_addr.val, desc->peer_id_addr.type);
-            // get_peer_irk(peerAddr);
+            LockProcess::LockProcess::DisplayCurrentLockState();
         }
 #endif
+        void onPassKeyNotify(uint32_t pass_key)
+        {
+            char buffer[10];
+            snprintf(buffer,sizeof(buffer),"%u",pass_key);
+            Display::Display::ClearDisplay();
+            for (char *p=buffer; *p != '\0'; p++)
+            {
+                Display::Display::WriteCharacter(*p);
+            }
+        }
     };
     class WiFiCharacteristicCallbacks : public BLECharacteristicCallbacks {
         void onWrite(BLECharacteristic* pWiFiCharacteristic) {
