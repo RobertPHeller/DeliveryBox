@@ -7,4 +7,4 @@ partitularly handy for people with long driveways.
 
 Here is a view of the box:
 
-![Isometric view of box](isomatric.png)
+![Isometric view of box](isometric.png)
