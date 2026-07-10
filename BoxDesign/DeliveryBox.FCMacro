@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-16 16:40:27
-#  Last Modified : <260627.0854>
+#  Last Modified : <260710.1320>
 #
 #  Description	
 #
@@ -133,7 +133,7 @@ class BOMHelper(object):
 class Sheet(BOMHelper):
     def __init__(self):
         raise RuntimeError("No Instances allowed for Sheet")
-    __CDX3_8Thick = Units.mm(11//32)
+    __CDX3_8Thick = Units.mm(11/32)
     @classmethod
     def CDXThick(cls):
         return cls.__CDX3_8Thick
@@ -268,6 +268,35 @@ class SpruceDimStock(BOMHelper):
     
 ## Chewy box: 24x17x6
 
+class Wheel(object):
+    __Diameter = Units.mm(6)
+    __Width    = Units.mm(1.5)
+    __Bore     = Units.mm(5/8)
+    __Color    = (0.0,0.0,0.0)
+    @classmethod
+    def Width(cls):
+        return cls.__Width
+    @classmethod
+    def Diameter(cls):
+        return cls.__Diameter
+    @classmethod
+    def Bore(cls):
+        return cls.__Bore
+    def __init__(self,name,origin,orient=Base.Vector(1,0,0)):
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        self.origin = origin
+        self.name = name
+        self.wheel = Part.makeCylinder(self.__Diameter/2.0,self.__Width,origin,orient)
+        self.wheel = self.wheel.cut(Part.makeCylinder(self.__Bore/2.0,self.__Width,origin,orient))
+    def show(self,doc=None):
+        if doc==None:
+            doc = App.activeDocument()
+        obj = doc.addObject("Part::Feature",self.name)
+        obj.Shape = self.wheel
+        obj.Label=self.name
+        obj.ViewObject.ShapeColor=self.__Color
+        
 class DeliveryBox(object):
     __OuterWidth = Units.mm(20)
     __OuterLength = Units.mm(24)
@@ -431,6 +460,16 @@ class DeliveryBox(object):
                                     self.OuterHeight-
                                        PianoHingeFlatOutsideBack.FlangeWidth()-
                                        (PianoHingeFlatOutsideBack.PinDia()/2))))
+        self.leftWheel = Wheel(self.name+"_leftWheel",origin.add(
+                         Base.Vector(-Wheel.Width(),Wheel.Diameter()/2,-Wheel.Bore())))
+        self.rightWheel = Wheel(self.name+"_rightWheel",origin.add(
+                         Base.Vector(self.OuterWidth,Wheel.Diameter()/2,-Wheel.Bore())))
+        self.axle = Part.makeCylinder(Wheel.Bore()/2,
+                                      self.OuterWidth+2*Wheel.Width()+Units.mm(1),
+                                      origin.add(Base.Vector(-(Wheel.Width()+Units.mm(1/2)),
+                                                             Wheel.Diameter()/2,
+                                                             -Wheel.Bore())),
+                                      Base.Vector(1,0,0))
     def show(self,doc=None):
         if doc==None:
             doc = App.activeDocument()
@@ -530,6 +569,12 @@ class DeliveryBox(object):
         obj.Label=self.name+"_lid_lockboard"
         obj.ViewObject.ShapeColor=SpruceDimStock.Color()
         self.hinge.show(doc)
+        self.leftWheel.show(doc)
+        self.rightWheel.show(doc)
+        obj = doc.addObject("Part::Feature",self.name+"_axle")
+        obj.Shape = self.axle
+        obj.Label=self.name+"_axle"
+        obj.ViewObject.ShapeColor=(0.9,0.9,0.9)
         
 if __name__ == '__main__':
     if "BenchWork" in App.listDocuments().keys():
