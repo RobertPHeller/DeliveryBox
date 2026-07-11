@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-17 14:15:08
-//  Last Modified : <260619.0815>
+//  Last Modified : <260711.1553>
 //
 //  Description	
 //
@@ -60,7 +60,7 @@ void DeliveryBoxWebserver::_MainScreen()
     _processForm();
     send(200,"text/html", 
          header_("Delivery Box") +
-         "<h1>Delivery Box</h1>" +
+         "<div class='topnav'><h1>Delivery Box</h1></div>" +
          _page() + 
          footer_());
 }
@@ -68,24 +68,30 @@ void DeliveryBoxWebserver::_MainScreen()
 String DeliveryBoxWebserver::_page()
 {
     String result;
+    result += "<div class='content'>";
     if (LockServo::LockServo::IsLocked())
     {
-        result += "<h3 style=\"color:green;\">Box is locked</h3>";
+        result += "<h3 style='color:green;'>Box is locked</h3>";
     }
     else
     {
-        result += "<h3 style=\"color:red;\">Box is unlocked</h3>";
+        result += "<h3 style='color:red;'>Box is unlocked</h3>";
     }
     result += "<form method='post' action='/' >\n";
-    result += "<label for='master-code'>Master Code</label>\n";
-    result += "<input type='number' id='master-code' name='master-code' size='8' maxlength='8' />\n";
-    result += "<button type='submit' name='set-master' value='true'>Set Master Code</button>\n";
+    result += "<div class='card-grid'><div class='card'><ul style='list-style-type: none;'>";
+    result += "<li><label for='master-code'>Master Code</label>\n";
+    result += "<input type='number' id='master-code' name='master-code' size='8' maxlength='8' /><\li>\n";
+    result += "<li><button type='submit' name='set-master' value='true'>Set Master Code</button></li>\n";
+    result += "</ul></div></div>";
     result += "</form>\n";
     result += "<form method='post' action='/' >\n";
-    result += "<label for='one-time'>One Time Code</label>\n";
-    result += "<input type='number' id='one-time' name='one-time' size='8' maxlength='8' />\n";
-    result += "<button type='submit' name='add-one-time' value='true'>Add One Time Code</button>\n";
+    result += "<div class='card-grid'><div class='card'><ul style='list-style-type: none;'>";
+    result += "<li><label for='one-time'>One Time Code</label>\n";
+    result += "<input type='number' id='one-time' name='one-time' size='8' maxlength='8' /></li>\n";
+    result += "<li><button type='submit' name='add-one-time' value='true'>Add One Time Code</button></li>\n";
+    result += "</ul></div></div>";
     result += "</form>\n";
+    result += "</div>";
     return result;
 }
 
@@ -105,17 +111,61 @@ void DeliveryBoxWebserver::_notFound()
 {
     send(404, "text/html", 
          header_("File Not Found") + 
-         "<h1>File Not Found</h1>" +
+         "<div class='topnav'><h1>File Not Found</h1></div>" +
          footer_());
 }
 
 void DeliveryBoxWebserver::_sendStyle()
 {
     send(200, "text/css", R"stylesheet(
-body { 
+html {
+    font-family: Arial, Helvetica, sans-serif;
+    display: inline-block;
+    text-align: center;
+}
+h1 {
+    font-size: 1.8rem;
+    color: white;
+}
+body {
+    margin: 0;
     background-color: #cccccc;
     font-family: Arial, Helvetica, Sans-Serif;
-Color: #000088;
+    Color: #000088;
+}
+.topnav {
+    overflow: hidden;
+    background-color: #0A1128;
+}
+.content {
+    padding: 50px;
+}
+.card-grid {
+    max-width: 800px;
+    margin: 0 auto;
+    margin-bottom: 30px;
+    display: grid;
+    grid-gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.card {
+    background-color: white;
+    box-shadow: 2px 2px 12px 1px rgba(140,140,140,.5);
+}
+button {
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.gray-label {
+    color: #bebebe;
+    font-size: 1rem;
+}
+
 }
 )stylesheet");
 }
@@ -147,6 +197,8 @@ String DeliveryBoxWebserver::footer_()
     return String(R"html(
 <footer id="colophon" class="site-footer" role="contentinfo">
 <p><img src="/Robot1-110.png" width="63" height="110" alt="Country Robot" style="float:left;" />&copy; 2024 Robert Heller D/B/A Deepwoods Software (The Country Robot)</p>
+<p><a href="https://www.thecountryrobot.com/">Created by Robert Heller</a></p>
+<p><a href="https://github.com/RobertPHeller/DeliveryBox">Full project here.</a></p>
 </footer>
 </body>
 </html>)html");
