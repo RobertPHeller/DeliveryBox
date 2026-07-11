@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-06-17 06:24:54
-#  Last Modified : <260628.1700>
+#  Last Modified : <260711.1510>
 #
 #  Description	
 #
@@ -71,6 +71,10 @@ upload: $(TARGET)
 		--pref build.flash_size=$(FLASHSIZE) \
 		$(INO)
 		
+NewPassCode: FORCE
+	-rm -f GeneratedPassKey.h
+	$(MAKE) $(TARGET)
+
 Revision.h: FORCE 
 	python3 ./Revision.py -d -t -H -U
 
