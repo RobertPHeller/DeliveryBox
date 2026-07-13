@@ -13,6 +13,7 @@
 		4C1BFBD430051B33005A5EAB /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4C1BFBD330051B33005A5EAB /* Preview Assets.xcassets */; };
 		4C1BFBDF30051B33005A5EAB /* DeliveryBox_iOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1BFBDE30051B33005A5EAB /* DeliveryBox_iOSTests.swift */; };
 		4C1BFBEA30051B34005A5EAB /* DeliveryBox_iOSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1BFBE930051B34005A5EAB /* DeliveryBox_iOSUITests.swift */; };
+		4CE6A7C3300553170085011F /* DeliveryBoxBLE.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CE6A7C2300553170085011F /* DeliveryBoxBLE.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		4C1BFBE530051B34005A5EAB /* DeliveryBox_iOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DeliveryBox_iOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C1BFBE930051B34005A5EAB /* DeliveryBox_iOSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryBox_iOSUITests.swift; sourceTree = "<group>"; };
 		4C1BFBEB30051B34005A5EAB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CE6A7C2300553170085011F /* DeliveryBoxBLE.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeliveryBoxBLE.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 			children = (
 				4C1BFBCC30051B32005A5EAB /* DeliveryBox_iOSApp.swift */,
 				4C1BFBCE30051B32005A5EAB /* ContentView.swift */,
+				4CE6A7C2300553170085011F /* DeliveryBoxBLE.swift */,
 				4C1BFBD030051B33005A5EAB /* Assets.xcassets */,
 				4C1BFBD530051B33005A5EAB /* Info.plist */,
 				4C1BFBD230051B33005A5EAB /* Preview Content */,
@@ -261,6 +264,7 @@
 			files = (
 				4C1BFBCF30051B32005A5EAB /* ContentView.swift in Sources */,
 				4C1BFBCD30051B32005A5EAB /* DeliveryBox_iOSApp.swift in Sources */,
+				4CE6A7C3300553170085011F /* DeliveryBoxBLE.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
