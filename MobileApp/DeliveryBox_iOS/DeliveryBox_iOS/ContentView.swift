@@ -19,7 +19,7 @@ struct ContentView: View {
     @ObservedObject var masterCode = NumbersOnly8()
     @ObservedObject var oneTimeCode = NumbersOnly8()
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .center, spacing: 12) {
           Text("Delivery Box App").font(.title)
           Section(header: Text("WiFi Configuration")) {
              VStack {
@@ -31,7 +31,10 @@ struct ContentView: View {
                                                              password: password)
                       }) 
              }
+             //.background(Color(red: 0, green: 1.0, blue: 0.0))
            }
+           .buttonStyle(DelBoxButtonStyle())
+           .frame(maxWidth: .infinity)
            Section(header: Text("Set Master Code")) {
              VStack {
                TextField("Master Code:", text: $masterCode.value)
@@ -40,8 +43,11 @@ struct ContentView: View {
                         action: {
                             deliveryBoxManager.SendMasterCode(masterCode: masterCode.value)
                         }) 
-             }
+               }
+               //.background(Color(red: 0, green: 1.0, blue: 0.0))
            }
+           .buttonStyle(DelBoxButtonStyle())
+           .frame(maxWidth: .infinity)
            Section(header: Text("Add One Time Code")) {
              VStack {
                TextField("One Time Code:", text: $oneTimeCode.value)
@@ -51,7 +57,10 @@ struct ContentView: View {
                             deliveryBoxManager.SendOneTimeCode(oneTimeCode: oneTimeCode.value)
                         }) 
              }
+             //.background(Color(red: 0, green: 1.0, blue: 0.0))
            }
+           .buttonStyle(DelBoxButtonStyle())
+           .frame(maxWidth: .infinity)
            Section(header: Text("Reboot")) {
              VStack {
                  Button("Reboot",
@@ -59,10 +68,22 @@ struct ContentView: View {
                        deliveryBoxManager.SendReboot()
                     }) 
               }
+              //.background(Color(red: 0, green: 1.0, blue: 0.0))
            }
+           .buttonStyle(DelBoxButtonStyle())
+           .frame(maxWidth: .infinity)
+           Link("Created by Robert Heller",
+                    destination: URL(string: "https://www.thecountryrobot.com/")!)
+                    .font(.footnote)
+                    .foregroundColor(.blue)
+                    .padding()
+           Link("Full project here.", 
+                    destination: URL(string: "https://github.com/RobertPHeller/DeliveryBox")!)
+                    .font(.footnote)
+                    .foregroundColor(.blue)
+                    .padding()
         }
         .padding()
-        .buttonStyle(DelBoxButtonStyle())
         .background(Color(red: 0.6784313725490196, 
                                green: 0.8470588235294118,
                                blue: 0.9019607843137255))
