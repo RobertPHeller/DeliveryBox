@@ -7,29 +7,17 @@
 
 import SwiftUI
 
-// ObservableObject that limits text fields to numbers (digits) only
-class NumbersOnly: ObservableObject {
-    @Published var value = "" {
-        didSet {
-            let filtered = value.filter { $0.isNumber }
-                                    
-            if value != filtered {
-                value = filtered
-            }
-        }
-    }
-}
-
-
+ 
 struct ContentView: View {
     // Connect to the BLE interface module
     var deliveryBoxManager = DeliveryBoxBLE()
-    let characterLimit = 8
     // Variables to hold input values
     @State var ssid = ""
     @State var password = ""
-    @ObservedObject var masterCode = NumbersOnly()
-    @ObservedObject var oneTimeCode = NumbersOnly()
+    //@State var masterCode = ""
+    //@State var oneTimeCode = ""
+    @ObservedObject var masterCode = NumbersOnly8()
+    @ObservedObject var oneTimeCode = NumbersOnly8()
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
           Text("Delivery Box App").font(.title)
@@ -48,14 +36,9 @@ struct ContentView: View {
              VStack {
                TextField("Master Code:", text: $masterCode.value)
                           .keyboardType(.decimalPad)
-                          .onChange(of: text) { newValue in
-                              if newValue.count > characterLimit {
-                                  text = String(newValue.prefix(characterLimit))
-                              }
-                           }
                Button("Set Master Code",
                         action: {
-                            deliveryBoxManager.SendMasterCode(masterCode: masterCode)
+                            deliveryBoxManager.SendMasterCode(masterCode: masterCode.value)
                         }) 
              }
            }
@@ -63,25 +46,26 @@ struct ContentView: View {
              VStack {
                TextField("One Time Code:", text: $oneTimeCode.value)
                           .keyboardType(.decimalPad)
-                          .onChange(of: text) { newValue in
-                              if newValue.count > characterLimit {
-                                  text = String(newValue.prefix(characterLimit))
-                              }
-                           }
                Button("Add One Time Code",
                         action: {
-                            deliveryBoxManager.SendOneTimeCode(oneTimeCode: oneTimeCode)
+                            deliveryBoxManager.SendOneTimeCode(oneTimeCode: oneTimeCode.value)
                         }) 
              }
            }
            Section(header: Text("Reboot")) {
-             Button("Reboot",
+             VStack {
+                 Button("Reboot",
                     action: {
-                     "   deliveryBoxManager.SendReboot()
+                       deliveryBoxManager.SendReboot()
                     }) 
+              }
            }
         }
         .padding()
+        .buttonStyle(DelBoxButtonStyle())
+        .background(Color(red: 0.6784313725490196, 
+                               green: 0.8470588235294118,
+                               blue: 0.9019607843137255))
     }
 }
 
