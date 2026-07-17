@@ -1,3 +1,5 @@
 (fp_lib_table
-  (lib (name "Displays")(type "KiCad")(uri "/home/heller/DeliveryBox/Circuit/DisplayModule/Displays.pretty")(options "")(descr ""))
+  (lib (name "Displays")(type "KiCad")(uri "${KIPRJMOD}/../DisplayModule/Displays.pretty")(options "")(descr ""))
+  (lib (name "ESP32-WROOM")(type "KiCad")(uri "${KIPRJMOD}/ESP32-WROOM.pretty")(options "")(descr ""))
+  (lib (name "Extra")(type "KiCad")(uri "${KIPRJMOD}/Extra.pretty")(options "")(descr ""))
 )

@@ -2,4 +2,5 @@
   (lib (name "LEDControlers")(type "KiCad")(uri "/home/heller/DeliveryBox/Circuit/DisplayModule/LEDControlers.kicad_sym")(options "")(descr ""))
   (lib (name "LED_Displys")(type "KiCad")(uri "/home/heller/DeliveryBox/Circuit/DisplayModule/LED_Displys.kicad_sym")(options "")(descr ""))
   (lib (name "AllInOneModule-eagle-import")(type "KiCad")(uri "${KIPRJMOD}/AllInOneModule-eagle-import.kicad_sym")(options "")(descr ""))
+  (lib (name "GCT_USB")(type "KiCad")(uri "${KIPRJMOD}/CONN_USB4930-00-A_GCT.kicad_sym")(options "")(descr ""))
 )
