@@ -2712,7 +2712,7 @@
     (in_bom yes) (on_board yes)
     (uuid 08d80019-55a3-4b43-ae6e-d4c068102a1f)
     (property "Reference" "CHG0" (id 0) (at 52.07 168.275 0))
-    (property "Value" "ORANGE" (id 1) (at 52.07 175.514 0))
+    (property "Value" "Charge" (id 1) (at 52.07 175.514 0))
     (property "Footprint" "LED_SMD:LED_0603_1608Metric" (id 2) (at 53.34 172.72 0)
       (effects (font (size 1.27 1.27)) hide)
     )
@@ -3085,7 +3085,7 @@
     (property "Reference" "X1" (id 0) (at 123.19 53.975 90)
       (effects (font (size 1.27 1.0795)) (justify left bottom))
     )
-    (property "Value" "JSTPH" (id 1) (at 123.19 43.18 90)
+    (property "Value" "Battery" (id 1) (at 123.19 43.18 90)
       (effects (font (size 1.27 1.0795)) (justify left bottom))
     )
     (property "Footprint" "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal" (id 2) (at 116.84 48.26 0)
@@ -4277,7 +4277,7 @@
       (reference "C101") (unit 1) (value "10uf") (footprint "Capacitor_SMD:C_0603_1608Metric")
     )
     (path "/08d80019-55a3-4b43-ae6e-d4c068102a1f"
-      (reference "CHG0") (unit 1) (value "ORANGE") (footprint "LED_SMD:LED_0603_1608Metric")
+      (reference "CHG0") (unit 1) (value "Charge") (footprint "LED_SMD:LED_0603_1608Metric")
     )
     (path "/b366251b-8404-4292-b10a-09cfc7c147b0"
       (reference "D4") (unit 1) (value "S5A") (footprint "Extra:S5AE357T")
@@ -4361,7 +4361,7 @@
       (reference "U101") (unit 1) (value "HT16K33") (footprint "Package_SO:SOIC-28W_7.5x18.7mm_P1.27mm")
     )
     (path "/416d7f87-5680-4e19-b7ca-f06b5514af89"
-      (reference "X1") (unit 1) (value "JSTPH") (footprint "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal")
+      (reference "X1") (unit 1) (value "Battery") (footprint "Connector_JST:JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal")
     )
     (path "/9c7675e4-432d-4544-9546-0b16942bf93d"
       (reference "X3") (unit 1) (value "USB C") (footprint "Extra:CONN_USB4930-00-A_GCT")
