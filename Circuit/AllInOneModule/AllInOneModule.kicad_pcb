@@ -505,8 +505,8 @@
       (net 2 "GND") (pinfunction "1") (pintype "passive") (tstamp 90b33076-c509-4ee9-b94d-ddfff7c40cdc))
     (pad "2" smd roundrect (at 1 -2.85 180) (size 1 3.5) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 3 "VBAT") (pinfunction "2") (pintype "passive") (tstamp 57e4fc01-8e00-4e5f-bc03-2b84f5ab522d))
-    (pad "MP" smd roundrect (at -3.35 2.9 180) (size 1.5 3.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.166667) (tstamp 791cf5e1-ed72-4e31-8072-eb44ccfe8656))
-    (pad "MP" smd roundrect (at 3.35 2.9 180) (size 1.5 3.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.166667) (tstamp 968ab74f-8d1f-40fe-b101-a1189618dd85))
+    (pad "MP" smd roundrect (at -3.35 2.9 180) (size 1.5 3.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.1666673333) (tstamp 791cf5e1-ed72-4e31-8072-eb44ccfe8656))
+    (pad "MP" smd roundrect (at 3.35 2.9 180) (size 1.5 3.4) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.1666673333) (tstamp 968ab74f-8d1f-40fe-b101-a1189618dd85))
     (model "${KICAD6_3DMODEL_DIR}/Connector_JST.3dshapes/JST_PH_S2B-PH-K_1x02_P2.00mm_Horizontal.step"
       (offset (xyz -1 1.5 0))
       (scale (xyz 1 1 1))
@@ -556,7 +556,7 @@
       (net 5 "/VHI") (pinfunction "S") (pintype "passive") (tstamp 54da6ff9-4497-44a8-998d-2e112e69ff0d))
     (pad "3" smd roundrect locked (at 1.1375 0) (size 1.325 0.6) (layers "F.Cu" "F.Paste" "F.Mask") (roundrect_rratio 0.25)
       (net 3 "VBAT") (pinfunction "D") (pintype "passive") (tstamp 0edede7e-dc2b-4ca4-9971-e5f55b7ebbb7))
-    (model "${KICAD6_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-23-3.wrl"
+    (model "${KICAD6_3DMODEL_DIR}/Package_TO_SOT_SMD.3dshapes/SOT-23.wrl"
       (offset (xyz 0 0 0))
       (scale (xyz 1 1 1))
       (rotate (xyz 0 0 0))
