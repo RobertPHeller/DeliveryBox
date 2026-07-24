@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Robert Heller.
+
+    All rights reserved.
+
+    Synopsis:    Main Layout
+    Authors:     Robert Heller
+-->
+<LinearLayout 
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  tools:context=".MainActivity"
+  android:background="@color/DWSSkyBlue"
+  >
+  
+  <!-- Title Block -->
+  <TextView
+    android:id="@+id/title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/app_title"
+    android:textSize="@dimen/text_h3_size"
+    android:textStyle="bold"
+    android:gravity="center"
+  />
+  
+  <!--WiFi Configuration-->
+  <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"  
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/wifi_section_title"
+      android:textSize="@dimen/text_h4_size"
+      android:textStyle="normal"
+      android:gravity="center"
+    />
+    <EditText
+      android:id="@+id/wifi_ssid"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:autofillHints="ssid"
+      android:inputType="text"
+      android:hint="Enter SSID"
+    />
+    <EditText
+      android:id="@+id/wifi_password"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:autofillHints="password"
+      android:inputType="textPassword"
+      android:hint="Enter Password"
+    />
+    <Button
+      android:id="@+id/configureWiFi"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/DWSForestGreen"
+      android:paddingStart="@dimen/button_padding"
+      android:paddingEnd="@dimen/button_padding"
+      android:text="@string/WiFiSubmit"
+      android:textSize="@dimen/button_text_size"
+      android:textColor="@color/button_text_color"
+    />
+    
+  </LinearLayout>
+  
+  <!--Set Master Code-->
+  <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"  
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/setmastercode_section_title"
+      android:textSize="@dimen/text_h4_size"
+      android:textStyle="normal"
+      android:gravity="center"
+    />
+    <EditText
+      android:id="@+id/masterCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:autofillHints="code"
+      android:inputType="number"
+      android:hint="Enter Master Code"
+      android:maxLength="8"
+    />
+    <Button
+      android:id="@+id/setMasterCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/DWSForestGreen"
+      android:paddingStart="@dimen/button_padding"
+      android:paddingEnd="@dimen/button_padding"
+      android:text="@string/SetMasterCodeSubmit"
+      android:textColor="@color/button_text_color"
+      android:textSize="@dimen/button_text_size"
+    />
+  </LinearLayout>
+  
+  <!--Add One Time Code-->
+  <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"  
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/addonetimecode_section_title"
+      android:textSize="@dimen/text_h4_size"
+      android:textStyle="normal"
+      android:gravity="center"
+    />
+    <EditText
+      android:id="@+id/oneTimeCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:autofillHints="code"
+      android:inputType="number"
+      android:hint="Enter One Time Code"
+      android:maxLength="8"
+    />
+    <Button
+      android:id="@+id/addOneTimeCode"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/DWSForestGreen"
+      android:paddingStart="@dimen/button_padding"
+      android:paddingEnd="@dimen/button_padding"
+      android:text="@string/AddOneTimeCode"
+      android:textColor="@color/button_text_color"
+      android:textSize="@dimen/button_text_size"
+    />
+  </LinearLayout>
+  
+  <!--Reboot-->
+  <LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"  
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <TextView 
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/reboot_section_title"
+      android:textSize="@dimen/text_h4_size"
+      android:textStyle="normal"
+      android:gravity="center"
+    />
+    <Button
+      android:id="@+id/reboot"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:background="@color/DWSForestGreen"
+      android:paddingStart="@dimen/button_padding"
+      android:paddingEnd="@dimen/button_padding"
+      android:text="@string/RebootSubmit"
+      android:textColor="@color/button_text_color"
+      android:textSize="@dimen/button_text_size"
+    />
+  </LinearLayout>
+  
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/created_by"
+    android:textSize="@dimen/text_footnote_size"
+    android:gravity="center"
+  />
+  <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/full_project"
+    android:textSize="@dimen/text_footnote_size"
+    android:gravity="center"
+  />
+  
+</LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Robert Heller.
+
+    All rights reserved.
+
+    Synopsis:    Dimensions
+    Authors:     Robert Heller
+-->
+<resources>
+   <dimen name="text_h1_size">96sp</dimen>
+   <dimen name="text_h2_size">60sp</dimen>
+   <dimen name="text_h3_size">48sp</dimen>
+   <dimen name="text_h4_size">34sp</dimen>
+   <dimen name="text_h5_size">24sp</dimen>
+   <dimen name="text_h6_size">20sp</dimen>
+   <dimen name="text_body_size">16sp</dimen>
+   <dimen name="text_footnote_size">12sp</dimen>
+   <dimen name="button_padding">10sp</dimen>
+   <dimen name="button_text_size">24sp</dimen>
+</resources>

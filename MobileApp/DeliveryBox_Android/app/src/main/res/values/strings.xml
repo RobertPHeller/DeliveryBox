@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Robert Heller.
+
+    All rights reserved.
+
+    Synopsis:    Strings
+    Authors:     Robert Heller
+-->
+<resources>
+  <string name="app_name">Delivery Box</string>
+  <string name="app_title">Delivery Box App</string>
+  <string name="wifi_section_title">WiFi Configuration</string>
+  <string name="WiFiSubmit">Configure WiFi</string>
+  <string name="setmastercode_section_title">Set Master Code</string>
+  <string name="SetMasterCodeSubmit">Set Master Code</string>
+  <string name="addonetimecode_section_title">Add One Time Code</string>
+  <string name="AddOneTimeCode">Add One Time Code</string> 
+  <string name="reboot_section_title">Reboot</string>
+  <string name="RebootSubmit">Reboot</string>
+  <string name="created_by"><a href="https://www.thecountryrobot.com/">Created by Robert Heller</a></string>
+  <string name="full_project"><a href="https://github.com/RobertPHeller/DeliveryBox">Full project here.</a></string>
+  
+</resources>
+

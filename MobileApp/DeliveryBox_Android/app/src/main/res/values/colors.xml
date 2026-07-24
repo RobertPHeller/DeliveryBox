@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Robert Heller.
+
+    All rights reserved.
+
+    Synopsis:    Colors
+    Authors:     Robert Heller
+-->
+<resources>
+  <color name="DWSSkyBlue">#add8e6</color>
+  <color name="DWSForestGreen">#336633</color>
+  <color name="button_text_color">#ffffff</color>
+</resources>
+
