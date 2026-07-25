@@ -15,6 +15,8 @@ import android.bluetooth.BluetoothManager
 import android.content.Context
 import androidx.core.content.ContextCompat
 import android.content.pm.PackageManager
+import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.ActivityResultLauncher
 
 class MainActivity : ComponentActivity() {
     private lateinit var bluetoothManager: BluetoothConnectionManager
@@ -26,7 +28,8 @@ class MainActivity : ComponentActivity() {
         if (allGranted) {
             initializeBluetooth()
         } else {
-            showPermissionRationaleDialog()
+            Toast.makeText(this, "Bluetooth permissions has not been granted!", Toast.LENGTH_LONG).show()
+            finish()
         }
     }
     
@@ -43,6 +46,36 @@ class MainActivity : ComponentActivity() {
         }
         
         checkAndRequestPermissions()
+        
+        // WiFiSubmit
+        val WiFiSubmitButton: Button = findViewById(R.id.configureWiFi)
+        WiFiSubmitButton.setOnClickListener {
+            val ssid: EditText = findViewById(R.id.wifi_ssid)
+            val thessid: String = ssid.text.toString()
+            val wifi_password: EditText = findViewById(R.id.wifi_password)
+            val thepassword: String = wifi_password.text.toString()
+            bluetoothManager.writeWiFiCharacteristic(thessid,
+                                                     thepassword)
+        }
+        // setMasterCode
+        val setMasterCodeButton: Button = findViewById(R.id.setMasterCode)
+        setMasterCodeButton.setOnClickListener {
+            val masterCode: EditText = findViewById(R.id.masterCode)
+            val theMasterCode: String = masterCode.text.toString()
+            bluetoothManager.writeMasterCodeCharacteristic(theMasterCode)
+        }
+        // addOneTimeCode
+        val addOneTimeCodeButton: Button = findViewById(R.id.addOneTimeCode)
+        addOneTimeCodeButton.setOnClickListener {
+            val oneTimeCode: EditText = findViewById(R.id.oneTimeCode)
+            val theOneTimeCode: String = oneTimeCode.text.toString()
+            bluetoothManager.writeOneTimeCodeCharacteristic(theOneTimeCode)
+        }
+        // reboot
+        val rebootButton: Button = findViewById(R.id.reboot)
+        rebootButton.setOnClickListener {
+            bluetoothManager.writeRebootCharacteristic()
+        }
     }
     
     private fun checkAndRequestPermissions() {
@@ -58,21 +91,49 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACCESS_FINE_LOCATION
             )
         }
-        
+
         val missingPermissions = permissions.filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
         
         if (missingPermissions.isNotEmpty()) {
-            bluetoothPermissionLauncher.launch(missingPermissions.toTypedArray())
+            if (shouldShowRequestPermissionRationale(missingPermissions.toString())) {
+                showPermissionRationaleDialog()
+            } else {
+                bluetoothPermissionLauncher.launch(missingPermissions.toTypedArray())
+            }
         } else {
             initializeBluetooth()
         }
     }
     private fun initializeBluetooth() {
-        // To Do
+        bluetoothManager.initialize()
     }
     private fun showPermissionRationaleDialog() {
-        // To Do: Alert Box explaining why we need Bluetooth access permissions
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        }
+        val missingPermissions = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        
+        AlertDialog.Builder(this)
+          .setTitle("Bluetooth Permission Needed for Delivery Box App")
+          .setMessage("This app requires access to Bluetooth to access your Delivery Box.")
+          .setPositiveButton("OK") { _, _ ->
+              bluetoothPermissionLauncher.launch(missingPermissions.toTypedArray())
+          }
+          .setNegativeButton("Cancel", null)
+          .create()
+          .show()
     }
 }

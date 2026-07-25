@@ -32,7 +32,20 @@ class BluetoothConnectionManager(private val context: Context) {
     
     fun isBluetoothEnabled(): Boolean = bluetoothAdapter?.isEnabled == true
     
-    // Additional methods will be added below
+    fun initialize() {
+    }
+    fun writeWiFiCharacteristic(ssid: String, password: String)
+    {
+    }
+    fun writeMasterCodeCharacteristic(masterCode: String)
+    {
+    }
+    fun writeOneTimeCodeCharacteristic(oneTimeCode: String)
+    {
+    }
+    fun writeRebootCharacteristic()
+    {
+    }
 }
 
 sealed class ConnectionState {
