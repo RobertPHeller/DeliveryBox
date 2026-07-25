@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2026 Robert Heller.
+
+    All rights reserved.
+
+    Synopsis:    Rounded buttons
+    Authors:     Robert Heller
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+  <solid android:color="@color/DWSForestGreen"/> <!-- Background color -->
+  <corners android:radius="16dp"/> <!-- Corner radius -->
+</shape>
