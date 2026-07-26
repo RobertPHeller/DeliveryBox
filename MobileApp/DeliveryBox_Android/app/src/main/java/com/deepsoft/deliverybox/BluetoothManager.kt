@@ -49,26 +49,33 @@ class BluetoothConnectionManager(private val context: Context) {
         if (bluetoothLeScanner == null) {
             return
         }
-        if (!scanning) { // Stops scanning after a pre-defined scan period.
-            handler.postDelayed({
-                                scanning = false
-                                bluetoothLeScanner.stopScan(leScanCallback)
-                            }, SCAN_PERIOD)
-                scanning = true
-                bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
-                                                    .setServiceData(ParcelUuid(ServiceUUID), 
-                                                                    null, 
-                                                                    null).build()),
-                                                    ScanSettings.Builder()
-                                                    .setNumOfMatches(ScanSettings.
-                                                                     MATCH_NUM_ONE_ADVERTISEMENT)
-                                                    .build(),
-                                                    leScanCallback)
-            } else {
-                scanning = false
-                bluetoothLeScanner.stopScan(leScanCallback)
+        try {
+            if (!scanning) { // Stops scanning after a pre-defined scan period.
+                handler.postDelayed({
+                                    scanning = false
+                                    bluetoothLeScanner.stopScan(leScanCallback)
+                                }, SCAN_PERIOD)
+                    scanning = true
+                    bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
+                                                        .setServiceData(ParcelUuid(ServiceUUID), 
+                                                                        null, 
+                                                                        null).build()),
+                                                        ScanSettings.Builder()
+                                                        .setNumOfMatches(ScanSettings.
+                                                                         MATCH_NUM_ONE_ADVERTISEMENT)
+                                                        .build(),
+                                                        leScanCallback)
+                } else {
+                    scanning = false
+                    bluetoothLeScanner.stopScan(leScanCallback)
+                }
+            }
+            catch (e: SecurityException) {
+                println("scanLeDevice: SecurityException caught: $e")
             }
         }
+        
+            
         
     // Device scan callback.
     private val leScanCallback: ScanCallback = object : ScanCallback() {
