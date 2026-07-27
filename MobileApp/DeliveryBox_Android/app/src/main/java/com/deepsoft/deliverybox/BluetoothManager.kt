@@ -10,9 +10,19 @@
 package com.deepsoft.deliverybox
 
 import java.util.UUID
+import android.annotation.SuppressLint
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothProfile
+import android.content.Intent
+import android.os.Binder
+import android.os.IBinder
+import android.util.Log
+import androidx.annotation.RequiresPermission
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.bluetooth.le.ScanCallback
@@ -29,7 +39,7 @@ import android.os.Looper
 
 
 
-class BluetoothConnectionManager(private val context: Context) {
+class BluetoothLeService(private val context: Context)  : Service() {
     private val ServiceUUID = UUID.fromString("3a6089ff-731f-4312-9761-6ecfa14b867e")
     private val WIFICharacteristicUUID = UUID.fromString("00e19a26-da6e-4ad2-896c-b5f0cbe04e43")
     private val MasterCodeCharacteristicUUID = UUID.fromString("fb90b3be-e21c-4aca-ae29-c05a0c3992e3")
@@ -83,8 +93,8 @@ class BluetoothConnectionManager(private val context: Context) {
         }
     }
         
-    private var foundDevice: BluetoothDevice?
-    private var haveDevice: boolean = false
+    private var foundDevice: BluetoothDevice? = null
+    private var haveDevice: Boolean = false
     // Device scan callback.
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
@@ -97,10 +107,27 @@ class BluetoothConnectionManager(private val context: Context) {
     
     fun isBluetoothEnabled(): Boolean = bluetoothAdapter?.isEnabled == true
     
+    private val binder = LocalBinder()
+    override fun onBind(intent: Intent): IBinder? {
+        return binder
+    }
+
+    inner class LocalBinder : Binder() {
+        fun getService(): BluetoothLeService {
+            return this@BluetoothLeService
+        }
+    }
+    var bluetoothGatt: BluetoothGatt? = null
+    
     fun initialize() {
         if (isBluetoothSupported() && isBluetoothEnabled())
         {
             scanLeDevice()
+        }
+        if (haveDevice)
+        {
+            // connect then scan for characteristics for serviceUUID
+            //bluetoothGatt = foundDevice.connectGatt(this, false, bluetoothGattCallback)
         }
     }
     fun writeWiFiCharacteristic(ssid: String, password: String)

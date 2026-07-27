@@ -19,7 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.ActivityResultLauncher
 
 class MainActivity : ComponentActivity() {
-    private lateinit var bluetoothManager: BluetoothConnectionManager
+    private lateinit var bluetoothLeService: BluetoothLeService
     
     private val bluetoothPermissionLauncher = registerForActivityResult(
                 ActivityResultContracts.RequestMultiplePermissions()
@@ -37,9 +37,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        bluetoothManager = BluetoothConnectionManager(this)
+        bluetoothLeService = BluetoothLeService(this)
         
-        if (!bluetoothManager.isBluetoothSupported()) {
+        if (!bluetoothLeService.isBluetoothSupported()) {
             Toast.makeText(this, "Bluetooth not supported on this device", Toast.LENGTH_LONG).show()
             finish()
             return
@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
             val thessid: String = ssid.text.toString()
             val wifi_password: EditText = findViewById(R.id.wifi_password)
             val thepassword: String = wifi_password.text.toString()
-            bluetoothManager.writeWiFiCharacteristic(thessid,
+            bluetoothLeService.writeWiFiCharacteristic(thessid,
                                                      thepassword)
         }
         // setMasterCode
@@ -62,19 +62,19 @@ class MainActivity : ComponentActivity() {
         setMasterCodeButton.setOnClickListener {
             val masterCode: EditText = findViewById(R.id.masterCode)
             val theMasterCode: String = masterCode.text.toString()
-            bluetoothManager.writeMasterCodeCharacteristic(theMasterCode)
+            bluetoothLeService.writeMasterCodeCharacteristic(theMasterCode)
         }
         // addOneTimeCode
         val addOneTimeCodeButton: Button = findViewById(R.id.addOneTimeCode)
         addOneTimeCodeButton.setOnClickListener {
             val oneTimeCode: EditText = findViewById(R.id.oneTimeCode)
             val theOneTimeCode: String = oneTimeCode.text.toString()
-            bluetoothManager.writeOneTimeCodeCharacteristic(theOneTimeCode)
+            bluetoothLeService.writeOneTimeCodeCharacteristic(theOneTimeCode)
         }
         // reboot
         val rebootButton: Button = findViewById(R.id.reboot)
         rebootButton.setOnClickListener {
-            bluetoothManager.writeRebootCharacteristic()
+            bluetoothLeService.writeRebootCharacteristic()
         }
     }
     
@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     private fun initializeBluetooth() {
-        bluetoothManager.initialize()
+        bluetoothLeService.initialize()
     }
     private fun showPermissionRationaleDialog() {
         val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
