@@ -25,6 +25,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import android.os.Handler
 import android.os.ParcelUuid
+import android.os.Looper
+
+
 
 class BluetoothConnectionManager(private val context: Context) {
     private val ServiceUUID = UUID.fromString("3a6089ff-731f-4312-9761-6ecfa14b867e")
@@ -39,7 +42,12 @@ class BluetoothConnectionManager(private val context: Context) {
     private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
     private var scanning = false
     private val bluetoothLeScanner = bluetoothAdapter?.getBluetoothLeScanner ()
-    private val handler = Handler()
+    
+    // Source - https://stackoverflow.com/a/79986182
+    // Posted by DebuggingByCoffee
+    // Retrieved 2026-07-27, License - CC BY-SA 4.0
+
+    private val handler = Handler(Looper.getMainLooper())
     
     // Stops scanning after 10 seconds.
     private val SCAN_PERIOD: Long = 10000
