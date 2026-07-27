@@ -63,33 +63,34 @@ class BluetoothConnectionManager(private val context: Context) {
                                     scanning = false
                                     bluetoothLeScanner.stopScan(leScanCallback)
                                 }, SCAN_PERIOD)
-                    scanning = true
-                    bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
-                                                        .setServiceData(ParcelUuid(ServiceUUID), 
-                                                                        null, 
-                                                                        null).build()),
-                                                        ScanSettings.Builder()
-                                                        .setNumOfMatches(ScanSettings.
-                                                                         MATCH_NUM_ONE_ADVERTISEMENT)
-                                                        .build(),
-                                                        leScanCallback)
-                } else {
-                    scanning = false
-                    bluetoothLeScanner.stopScan(leScanCallback)
-                }
-            }
-            catch (e: SecurityException) {
-                println("scanLeDevice: SecurityException caught: $e")
+                scanning = true
+                bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
+                                                    .setServiceData(ParcelUuid(ServiceUUID), 
+                                                                    null, 
+                                                                    null).build()),
+                                                    ScanSettings.Builder()
+                                                    .setNumOfMatches(ScanSettings.
+                                                                     MATCH_NUM_ONE_ADVERTISEMENT)
+                                                    .build(),
+                                                    leScanCallback)
+            } else {
+                scanning = false
+                bluetoothLeScanner.stopScan(leScanCallback)
             }
         }
+        catch (e: SecurityException) {
+            println("scanLeDevice: SecurityException caught: $e")
+        }
+    }
         
-            
-        
+    private var foundDevice: BluetoothDevice?
+    private var haveDevice: boolean = false
     // Device scan callback.
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             super.onScanResult(callbackType, result)
-            //
+            foundDevice = result.device
+            haveDevice = true
         }
     }
     fun isBluetoothSupported(): Boolean = bluetoothAdapter != null
