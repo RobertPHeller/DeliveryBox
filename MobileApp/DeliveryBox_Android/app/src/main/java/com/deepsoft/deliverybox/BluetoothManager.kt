@@ -179,17 +179,58 @@ class BluetoothLeService(private val context: Context)  : Service() {
              }
          }
     }
+    @Suppress("DEPRECATION")
     fun writeWiFiCharacteristic(ssid: String, password: String)
     {
+        val message: String = ssid + "\n" + password
+        if (connectionState == STATE_CONNECTED && 
+            bluetoothGatt != null) {
+            val characteristic = WIFICharacteristic
+            if (characteristic != null) {
+                characteristic.setValue(message.toByteArray())
+                characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+                bluetoothGatt!!.writeCharacteristic(characteristic)
+            }
+        }
     }
+    @Suppress("DEPRECATION")
     fun writeMasterCodeCharacteristic(masterCode: String)
     {
+        if (connectionState == STATE_CONNECTED && 
+            bluetoothGatt != null) {
+            val characteristic = MasterCodeCharacteristic
+            if (characteristic != null) {
+                characteristic.setValue(masterCode.toByteArray())
+                characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+                bluetoothGatt!!.writeCharacteristic(characteristic)
+            }
+        }
     }
+    @Suppress("DEPRECATION")
     fun writeOneTimeCodeCharacteristic(oneTimeCode: String)
     {
+        if (connectionState == STATE_CONNECTED && 
+            bluetoothGatt != null) {
+            val characteristic = OneTimeCodeCharacteristic
+            if (characteristic != null) {
+                characteristic.setValue(oneTimeCode.toByteArray())
+                characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+                bluetoothGatt!!.writeCharacteristic(characteristic)
+            }
+        }
     }
+    @Suppress("DEPRECATION")
     fun writeRebootCharacteristic()
     {
+        if (connectionState == STATE_CONNECTED && 
+            bluetoothGatt != null) {
+            val characteristic = RestartCharacteristic
+            if (characteristic != null) {
+                characteristic.setValue("REBOOT".toByteArray())
+                characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
+                bluetoothGatt!!.writeCharacteristic(characteristic)
+            }
+        }
     }
 }
 
