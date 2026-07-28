@@ -12,12 +12,17 @@ package com.deepsoft.deliverybox
 import java.util.UUID
 import android.annotation.SuppressLint
 import android.app.Service
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothProfile
+import java.util.concurrent.Executors
+import android.bluetooth.*
+//import android.bluetooth.BluetoothAdapter
+//import android.bluetooth.BluetoothDevice
+//import android.bluetooth.BluetoothManager
+//import android.bluetooth.BluetoothGatt
+//import android.bluetooth.BluetoothGattCallback
+//import android.bluetooth.BluetoothProfile
+//import android.bluetooth.BluetoothGattService
+//import android.bluetooth.BluetoothGattCharacteristic
+//import android.bluetooth.BluetoothGattCharacteristics
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
@@ -27,7 +32,7 @@ import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanSettings
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-
+import android.bluetooth.BluetoothGattConnectionSettings
 import android.content.Context
 import android.content.IntentFilter
 import android.os.Build
@@ -38,13 +43,17 @@ import android.os.ParcelUuid
 import android.os.Looper
 
 
-
+@SuppressLint("MissingPermission")
 class BluetoothLeService(private val context: Context)  : Service() {
     private val ServiceUUID = UUID.fromString("3a6089ff-731f-4312-9761-6ecfa14b867e")
     private val WIFICharacteristicUUID = UUID.fromString("00e19a26-da6e-4ad2-896c-b5f0cbe04e43")
+    private var WIFICharacteristic: BluetoothGattCharacteristic? = null
     private val MasterCodeCharacteristicUUID = UUID.fromString("fb90b3be-e21c-4aca-ae29-c05a0c3992e3")
+    private var MasterCodeCharacteristic: BluetoothGattCharacteristic? = null
     private val OneTimeCodeCharacteristicUUID = UUID.fromString("3d32154a-50f1-4e7d-883e-2b95ad680d3f")
+    private var OneTimeCodeCharacteristic: BluetoothGattCharacteristic? = null
     private val RestartCharacteristicUUID = UUID.fromString("2f1c6d70-9d97-47d7-8c9b-cb0b96bddea6")
+    private var RestartCharacteristic: BluetoothGattCharacteristic? = null
     
     
     
@@ -52,6 +61,39 @@ class BluetoothLeService(private val context: Context)  : Service() {
     private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
     private var scanning = false
     private val bluetoothLeScanner = bluetoothAdapter?.getBluetoothLeScanner ()
+    
+    private var connectionState = STATE_DISCONNECTED
+    
+    
+    companion object {
+        const val ACTION_GATT_CONNECTED =
+            "com.deepsoft.deliverybox.ACTION_GATT_CONNECTED"
+        const val ACTION_GATT_DISCONNECTED =
+            "com.deepsoft.deliverybox.ACTION_GATT_DISCONNECTED"
+
+        private const val STATE_DISCONNECTED = 0
+        private const val STATE_CONNECTED = 2
+    }
+
+    private val bluetoothGattCallback = object : BluetoothGattCallback() {
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, 
+                                             status: Int, newState: Int) {
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                // successfully connected to the GATT Server
+                connectionState = STATE_CONNECTED
+                broadcastUpdate(ACTION_GATT_CONNECTED)
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                // disconnected from the GATT Server
+                connectionState = STATE_DISCONNECTED
+                broadcastUpdate(ACTION_GATT_DISCONNECTED)
+            }
+        }
+    }
+
+    private fun broadcastUpdate(action: String) {
+        val intent = Intent(action)
+        sendBroadcast(intent)
+    }
     
     // Source - https://stackoverflow.com/a/79986182
     // Posted by DebuggingByCoffee
@@ -67,29 +109,24 @@ class BluetoothLeService(private val context: Context)  : Service() {
         if (bluetoothLeScanner == null) {
             return
         }
-        try {
-            if (!scanning) { // Stops scanning after a pre-defined scan period.
-                handler.postDelayed({
-                                    scanning = false
-                                    bluetoothLeScanner.stopScan(leScanCallback)
-                                }, SCAN_PERIOD)
-                scanning = true
-                bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
-                                                    .setServiceData(ParcelUuid(ServiceUUID), 
-                                                                    null, 
-                                                                    null).build()),
-                                                    ScanSettings.Builder()
-                                                    .setNumOfMatches(ScanSettings.
-                                                                     MATCH_NUM_ONE_ADVERTISEMENT)
-                                                    .build(),
-                                                    leScanCallback)
-            } else {
-                scanning = false
-                bluetoothLeScanner.stopScan(leScanCallback)
-            }
-        }
-        catch (e: SecurityException) {
-            println("scanLeDevice: SecurityException caught: $e")
+        if (!scanning) { // Stops scanning after a pre-defined scan period.
+            handler.postDelayed({
+                                scanning = false
+                                bluetoothLeScanner.stopScan(leScanCallback)
+                            }, SCAN_PERIOD)
+            scanning = true
+            bluetoothLeScanner.startScan(listOf(ScanFilter.Builder()
+                                                .setServiceData(ParcelUuid(ServiceUUID), 
+                                                                null, 
+                                                                null).build()),
+                                                ScanSettings.Builder()
+                                                .setNumOfMatches(ScanSettings.
+                                                                 MATCH_NUM_ONE_ADVERTISEMENT)
+                                                .build(),
+                                                leScanCallback)
+        } else {
+            scanning = false
+            bluetoothLeScanner.stopScan(leScanCallback)
         }
     }
         
@@ -119,6 +156,7 @@ class BluetoothLeService(private val context: Context)  : Service() {
     }
     var bluetoothGatt: BluetoothGatt? = null
     
+    @Suppress("DEPRECATION")
     fun initialize() {
         if (isBluetoothSupported() && isBluetoothEnabled())
         {
@@ -127,8 +165,19 @@ class BluetoothLeService(private val context: Context)  : Service() {
         if (haveDevice)
         {
             // connect then scan for characteristics for serviceUUID
-            //bluetoothGatt = foundDevice.connectGatt(this, false, bluetoothGattCallback)
-        }
+            bluetoothGatt = foundDevice!!
+                        .connectGatt(this,
+                                     false,
+                                     bluetoothGattCallback)
+            if (connectionState == STATE_CONNECTED) {
+                 bluetoothGatt!!.discoverServices()
+                 val service: BluetoothGattService? = bluetoothGatt!!.getService(ServiceUUID)
+                 WIFICharacteristic = service!!.getCharacteristic(WIFICharacteristicUUID)
+                 MasterCodeCharacteristic = service!!.getCharacteristic(MasterCodeCharacteristicUUID)
+                 OneTimeCodeCharacteristic = service!!.getCharacteristic(OneTimeCodeCharacteristicUUID)
+                 RestartCharacteristic = service!!.getCharacteristic(RestartCharacteristicUUID)
+             }
+         }
     }
     fun writeWiFiCharacteristic(ssid: String, password: String)
     {
