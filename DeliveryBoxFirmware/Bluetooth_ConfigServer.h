@@ -8,7 +8,7 @@
 //  Author        : $Author$
 //  Created By    : Robert Heller
 //  Created       : 2026-06-28 12:32:21
-//  Last Modified : <260629.2046>
+//  Last Modified : <260729.0724>
 //
 //  Description	
 //
@@ -126,16 +126,22 @@ private:
                 ssid = value.substring(0,nl-1);
                 passPhrase = value.substring(nl+1);
             }
+            File fp = SPIFFS.open("/secrets.txt", FILE_WRITE);
+            fp.println(ssid); 
+            fp.println(passPhrase);
+            fp.close();
         }
     };
     class MasterCodeCharacteristicCallbacks : public BLECharacteristicCallbacks {
         void onWrite(BLECharacteristic* pMasterCodeCharacteristic) {
             String value = pMasterCodeCharacteristic->getValue();
+            LockProcess::LockProcess::SetMasterCode(value);
         }
     };
     class OneTimeCodeCharacteristicCallbacks : public BLECharacteristicCallbacks {
         void onWrite(BLECharacteristic* pOneTimeCodeCharacteristic) {
             String value = pOneTimeCodeCharacteristic->getValue();
+            LockProcess::LockProcess::AddOneTimeCode(value);
         }
     };
     class RestartCharacteristicCallbacks : public BLECharacteristicCallbacks {
