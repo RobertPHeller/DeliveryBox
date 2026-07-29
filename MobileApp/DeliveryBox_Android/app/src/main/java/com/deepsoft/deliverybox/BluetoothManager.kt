@@ -176,8 +176,24 @@ class BluetoothLeService(private val context: Context)  : Service() {
                  MasterCodeCharacteristic = service!!.getCharacteristic(MasterCodeCharacteristicUUID)
                  OneTimeCodeCharacteristic = service!!.getCharacteristic(OneTimeCodeCharacteristicUUID)
                  RestartCharacteristic = service!!.getCharacteristic(RestartCharacteristicUUID)
-             }
-         }
+            }
+        }
+    }
+    @Suppress("DEPRECATION")
+    private fun reconnectAfterDelay() {
+        if (bluetoothGatt != null) {
+            bluetoothGatt!!.close()
+            bluetoothGatt = null
+            WIFICharacteristic = null
+            MasterCodeCharacteristic = null
+            OneTimeCodeCharacteristic = null
+            RestartCharacteristic = null
+            connectionState = STATE_DISCONNECTED
+            broadcastUpdate(ACTION_GATT_DISCONNECTED)
+            foundDevice = null
+            haveDevice = false
+            Handler().postDelayed({initialize()}, 2000)
+        }
     }
     @Suppress("DEPRECATION")
     fun writeWiFiCharacteristic(ssid: String, password: String)
@@ -229,6 +245,7 @@ class BluetoothLeService(private val context: Context)  : Service() {
                 characteristic.setValue("REBOOT".toByteArray())
                 characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE)
                 bluetoothGatt!!.writeCharacteristic(characteristic)
+                reconnectAfterDelay()
             }
         }
     }
