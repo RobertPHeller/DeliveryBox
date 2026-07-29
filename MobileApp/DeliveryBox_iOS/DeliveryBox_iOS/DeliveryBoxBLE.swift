@@ -27,7 +27,15 @@ class DeliveryBoxBLE: NSObject, CBCentralManagerDelegate {
        super.init()
        centralManager = CBCentralManager(delegate: self, queue: nil)
     }
-                        
+    
+    func reConnect() {
+        centralManager.cancelPeripheralConnection(peripheral_)
+        connected = false
+        centralManager.scanForPeripherals(
+            withServices: [ServiceUUID],
+            options: nil)
+        
+    }     
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
           // Start scanning for devices
@@ -36,6 +44,8 @@ class DeliveryBoxBLE: NSObject, CBCentralManagerDelegate {
             options: nil)
         }
     }
+    
+    
                                                 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         print("Discovered \(peripheral.name ?? "a device")")
@@ -98,5 +108,6 @@ class DeliveryBoxBLE: NSObject, CBCentralManagerDelegate {
         let data: Data = Data("REBOOT".utf8)
         peripheral_.writeValue(data, for: RestartCharacteristic,
                                 type: .withoutResponse)
+        reConnect()
     }
 }
